@@ -2,8 +2,3 @@
 #include <stdio.h>
 
 
-void print()
-{
-    printf("hoo\n");
-}
-

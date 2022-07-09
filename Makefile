@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-std=gnu17 -ggdb -Wall -Isrc
-LIBS=-L. -lcglm -lSDL2 -lSDL2_image
+LIBS=-L. -lm -lcglm -lSDL2 -lSDL2_image
 
 SRC=$(wildcard src/*.c)
 OBJS=$(addprefix obj/, $(SRC:.c=.o))
