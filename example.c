@@ -1,6 +1,8 @@
 #include "graph.h"
 #include "render.h"
 #include "buffer.h"
+#include "shader/lexer.h"
+#include "shader/util.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
@@ -9,6 +11,22 @@
 
 int main(int argc, char **argv)
 {
+    char *contents = util_read_file("shaders/test.frag");
+    struct Lexer *l = lexer_alloc(contents);
+
+    struct Token *t = 0;
+
+    while ((t = lexer_next_token(l))->type != TT_EOF)
+    {
+        printf("Type %d value %s\n", t->type, t->value);
+        token_free(t);
+    }
+
+    token_free(t);
+    lexer_free(l);
+
+    return 0;
+
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
 
