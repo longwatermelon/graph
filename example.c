@@ -3,6 +3,7 @@
 #include "buffer.h"
 #include "shader/lexer.h"
 #include "shader/util.h"
+#include "shader/parser.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
@@ -11,19 +12,24 @@
 
 int main(int argc, char **argv)
 {
-    char *contents = util_read_file("shaders/test.frag");
-    struct Lexer *l = lexer_alloc(contents);
+    struct Parser *p = parser_alloc("shaders/test.vert");
+    struct Node *root = parser_parse(p);
+    
+    node_free(root);
+    parser_free(p);
+    /* char *contents = util_read_file("shaders/test.vert"); */
+    /* struct Lexer *l = lexer_alloc(contents); */
 
-    struct Token *t = 0;
+    /* struct Token *t = 0; */
 
-    while ((t = lexer_next_token(l))->type != TT_EOF)
-    {
-        printf("Type %d value %s\n", t->type, t->value);
-        token_free(t);
-    }
+    /* while ((t = lexer_next_token(l))->type != TT_EOF) */
+    /* { */
+    /*     printf("Type %d value %s\n", t->type, t->value); */
+    /*     token_free(t); */
+    /* } */
 
-    token_free(t);
-    lexer_free(l);
+    /* token_free(t); */
+    /* lexer_free(l); */
 
     return 0;
 
