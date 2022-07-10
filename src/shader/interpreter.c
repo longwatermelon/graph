@@ -64,7 +64,7 @@ struct Node *interp_visit(struct Interpreter *in, struct Node *n)
     {
     case NODE_INT:
     case NODE_VEC3:
-    case NODE_NOOP:
+    case NODE_VOID:
         return n;
     case NODE_COMPOUND: return interp_visit_compound(in, n);
     case NODE_VAR: return interp_visit_var(in, n);

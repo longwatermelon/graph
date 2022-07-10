@@ -16,8 +16,7 @@ enum
     NODE_COMPOUND,
     NODE_PARAM,
     NODE_ASSIGN,
-    NODE_CONSTRUCTOR,
-    NODE_NOOP
+    NODE_CONSTRUCTOR
 };
 
 enum
