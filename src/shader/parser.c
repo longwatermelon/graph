@@ -157,6 +157,8 @@ struct Node *parser_parse_vardef(struct Parser *p)
         struct Node *n = node_alloc(NODE_VARDEF);
         n->vardef_name = name;
         n->vardef_type = node_str2nt(type);
+        // Default value allocation
+        n->vardef_value = node_alloc(n->vardef_type);
 
         return n;
     }

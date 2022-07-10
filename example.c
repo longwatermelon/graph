@@ -4,6 +4,7 @@
 #include "shader/lexer.h"
 #include "shader/util.h"
 #include "shader/parser.h"
+#include "shader/interpreter.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
@@ -14,9 +15,14 @@ int main(int argc, char **argv)
 {
     struct Parser *p = parser_alloc("shaders/test.vert");
     struct Node *root = parser_parse(p);
-    
+
+    struct Interpreter *in = interp_alloc();
+    interp_visit(in, root);
+    interp_run(in);
+
     node_free(root);
     parser_free(p);
+    interp_free(in);
     /* char *contents = util_read_file("shaders/test.vert"); */
     /* struct Lexer *l = lexer_alloc(contents); */
 
