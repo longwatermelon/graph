@@ -11,13 +11,13 @@ struct Shader *shader_alloc(const char *vert, const char *frag)
     s->vert_in = interp_alloc();
     s->frag_in = interp_alloc();
 
-    struct Parser *parser = parser_alloc(vert);
-    s->vert_root = parser_parse(parser);
-    parser_free(parser);
+    struct Parser *vert_parser = parser_alloc(vert);
+    s->vert_root = parser_parse(vert_parser);
+    parser_free(vert_parser);
 
-    parser = parser_alloc(frag);
-    s->frag_root = parser_parse(parser);
-    parser_free(parser);
+    struct Parser *frag_parser = parser_alloc(frag);
+    s->frag_root = parser_parse(frag_parser);
+    parser_free(frag_parser);
 
     interp_prepare(s->vert_in, s->vert_root);
     interp_prepare(s->frag_in, s->frag_root);

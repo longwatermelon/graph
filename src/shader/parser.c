@@ -110,14 +110,15 @@ struct Node *parser_parse_id(struct Parser *p)
 
 struct Node *parser_parse_var(struct Parser *p)
 {
-    char *id = strdup(p->curr->value);
+    // No strdup, early return leaks memory
+    char *id = p->curr->value;
     parser_expect(p, TT_ID);
 
     if (p->curr->type == TT_LPAREN) return parser_parse_call(p);
     if (p->curr->type == TT_EQUAL) return parser_parse_assign(p);
 
     struct Node *n = node_alloc(NODE_VAR);
-    n->var_name = id;
+    n->var_name = strdup(id);
 
     return n;
 }
@@ -125,7 +126,7 @@ struct Node *parser_parse_var(struct Parser *p)
 
 struct Node *parser_parse_vardef(struct Parser *p)
 {
-    char *type = strdup(p->curr->value);
+    int type = node_str2nt(p->curr->value);
     parser_expect(p, TT_ID);
 
     if (p->curr->type == TT_LPAREN)
@@ -142,7 +143,7 @@ struct Node *parser_parse_vardef(struct Parser *p)
         struct Node *n = node_alloc(NODE_VARDEF);
 
         n->vardef_name = name;
-        n->vardef_type = node_str2nt(type);
+        n->vardef_type = type;
 
         n->vardef_value = value;
 
@@ -150,13 +151,13 @@ struct Node *parser_parse_vardef(struct Parser *p)
     }
     else if (p->curr->type == TT_LPAREN)
     {
-        return parser_parse_fdef(p, node_str2nt(type), name);
+        return parser_parse_fdef(p, type, name);
     }
     else
     {
         struct Node *n = node_alloc(NODE_VARDEF);
         n->vardef_name = name;
-        n->vardef_type = node_str2nt(type);
+        n->vardef_type = type;
         // Default value allocation
         n->vardef_value = node_alloc(n->vardef_type);
 

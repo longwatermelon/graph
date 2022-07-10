@@ -60,6 +60,7 @@ void node_free(struct Node *n)
     if (n->vardef_value) node_free(n->vardef_value);
     if (n->assign_left) node_free(n->assign_left);
     if (n->assign_right) node_free(n->assign_right);
+    if (n->fdef_body) node_free(n->fdef_body);
 
     if (n->call_args)
     {

@@ -28,6 +28,7 @@ void interp_run(struct Interpreter *in)
     struct Node *n = node_alloc(NODE_FUNC_CALL);
     n->call_name = strdup("main");
     interp_visit(in, n);
+    node_free(n);
 }
 
 
@@ -161,6 +162,9 @@ struct Node *interp_visit_assignment(struct Interpreter *in, struct Node *n)
         fprintf(stderr, "Interpreter error: %d is not a data type.\n", def->vardef_type);
         exit(EXIT_FAILURE);
     }
+
+    if (n->assign_right->type == NODE_CONSTRUCTOR)
+        node_free(right);
 
     return def;
 }
