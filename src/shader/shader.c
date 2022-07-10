@@ -2,25 +2,18 @@
 #include <string.h>
 
 
-struct Shader *shader_alloc(const char *vert, const char *frag)
+struct Shader *shader_alloc(const char *path)
 {
     struct Shader *s = malloc(sizeof(struct Shader));
-    strcpy(s->vert, vert);
-    strcpy(s->frag, frag);
+    strcpy(s->path, path);
 
-    s->vert_in = interp_alloc();
-    s->frag_in = interp_alloc();
+    s->in = interp_alloc();
 
-    struct Parser *vert_parser = parser_alloc(vert);
-    s->vert_root = parser_parse(vert_parser);
-    parser_free(vert_parser);
+    struct Parser *parser = parser_alloc(path);
+    s->root = parser_parse(parser);
+    parser_free(parser);
 
-    struct Parser *frag_parser = parser_alloc(frag);
-    s->frag_root = parser_parse(frag_parser);
-    parser_free(frag_parser);
-
-    interp_prepare(s->vert_in, s->vert_root);
-    interp_prepare(s->frag_in, s->frag_root);
+    interp_prepare(s->in, s->root);
 
     return s;
 }
@@ -28,11 +21,8 @@ struct Shader *shader_alloc(const char *vert, const char *frag)
 
 void shader_free(struct Shader *s)
 {
-    interp_free(s->vert_in);
-    interp_free(s->frag_in);
-
-    node_free(s->vert_root);
-    node_free(s->frag_root);
+    interp_free(s->in);
+    node_free(s->root);
 
     free(s);
 }
@@ -40,20 +30,11 @@ void shader_free(struct Shader *s)
 
 void shader_run(struct Shader *s)
 {
-    interp_clear(s->vert_in);
-    interp_clear(s->frag_in);
+    interp_clear(s->in);
 
-    interp_prepare(s->vert_in, s->vert_root);
-    shader_insert_runtime_inputs(s, s->vert_in);
-    interp_run(s->vert_in);
-
-    // Send outputs from vertex shader to fragment shader
-    shader_clear_inputs(s);
-    s->inputs = interp_output_variables(s->vert_in, &s->ninputs);
-
-    interp_prepare(s->frag_in, s->frag_root);
-    shader_insert_runtime_inputs(s, s->frag_in);
-    interp_run(s->frag_in);
+    interp_prepare(s->in, s->root);
+    shader_insert_runtime_inputs(s, s->in);
+    interp_run(s->in);
 
     shader_clear_inputs(s);
 }
@@ -133,12 +114,14 @@ void shader_clear_inputs(struct Shader *s)
 }
 
 
-struct Node *shader_frag_outvar(struct Shader *s, const char *name)
+struct Node *shader_outvar(struct Shader *s, const char *name)
 {
-    for (size_t i = 0; i < s->frag_in->nvardefs; ++i)
+    for (size_t i = 0; i < s->in->nvardefs; ++i)
     {
-        if (strcmp(s->frag_in->vardefs[i]->vardef_name, name) == 0)
-            return s->frag_in->vardefs[i];
+        struct Node *def = s->in->vardefs[i];
+
+        if (strcmp(def->vardef_name, name) == 0 && def->vardef_modifier == VAR_OUT)
+            return s->in->vardefs[i];
     }
 
     return 0;

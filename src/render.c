@@ -119,7 +119,7 @@ void fill_edges(vec3 a, vec3 b, RTI *l1, RTI *l2)
             shader_add_input_int(g_shader, "i_y", (int)pos[1]);
             shader_run(g_shader);
 
-            struct Node *color_node = shader_frag_outvar(g_shader, "gr_color");
+            struct Node *color_node = shader_outvar(g_shader, "gr_color");
             hex = 0x000000 | (int)color_node->vardef_value->vec3_value[0] << 16 | (int)color_node->vardef_value->vec3_value[1] << 8 | (int)color_node->vardef_value->vec3_value[2];
             /* printf("%d\n", (int)color_node->vardef_value->vec3_value[0]); */
 

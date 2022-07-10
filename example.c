@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 
     graph_buffer_data(sizeof(verts), verts);
 
-    struct Shader *shader = shader_alloc("shaders/test.vert", "shaders/test.frag");
+    struct Shader *shader = shader_alloc("shaders/test.grsl");
     graph_use_shader(shader);
 
     while (running)

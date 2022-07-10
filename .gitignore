@@ -3,3 +3,5 @@ compile_commands.json
 obj/
 .cache/
 libgraph.a
+gmon.out
+perf

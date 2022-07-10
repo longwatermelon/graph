@@ -6,15 +6,15 @@
 
 struct Shader
 {
-    struct Interpreter *vert_in, *frag_in;
-    struct Node *vert_root, *frag_root;
-    char vert[PATH_MAX], frag[PATH_MAX];
+    struct Interpreter *in;
+    struct Node *root;
+    char path[PATH_MAX];
 
     struct Node **inputs;
     size_t ninputs;
 };
 
-struct Shader *shader_alloc(const char *vert, const char *frag);
+struct Shader *shader_alloc(const char *path);
 void shader_free(struct Shader *s);
 
 void shader_run(struct Shader *s);
@@ -25,7 +25,7 @@ void shader_add_input_vec3(struct Shader *s, const char *name, vec3 v);
 struct Node *shader_new_input(struct Shader *s, const char *name, int type);
 void shader_clear_inputs(struct Shader *s);
 
-struct Node *shader_frag_outvar(struct Shader *s, const char *name);
+struct Node *shader_outvar(struct Shader *s, const char *name);
 
 #endif
 
