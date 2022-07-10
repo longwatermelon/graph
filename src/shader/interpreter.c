@@ -71,6 +71,7 @@ struct Node *interp_visit(struct Interpreter *in, struct Node *n)
     case NODE_FUNC_CALL: return interp_visit_call(in, n);
     case NODE_FUNC_DEF: return interp_visit_fdef(in, n);
     case NODE_ASSIGN: return interp_visit_assignment(in, n);
+    case NODE_CONSTRUCTOR: return interp_visit_constructor(in, n);
     }
 
     fprintf(stderr, "Interpreter error: Uncaught statement of node type %d.\n",
@@ -162,6 +163,39 @@ struct Node *interp_visit_assignment(struct Interpreter *in, struct Node *n)
     }
 
     return def;
+}
+
+
+struct Node *interp_visit_constructor(struct Interpreter *in, struct Node *n)
+{
+    switch (n->construct_type)
+    {
+    case NODE_INT:
+    {
+        if (n->construct_nvalues != 1)
+        {
+            fprintf(stderr, "Interpreter error: Expected 1 argument to int constructor but %zu were given.\n",
+                    n->construct_nvalues);
+            exit(EXIT_FAILURE);
+        }
+
+        struct Node *res = node_alloc(NODE_INT);
+        res->int_value = interp_visit(in, n->construct_values[0])->int_value;
+        return res;
+    } break;
+    case NODE_VEC3:
+    {
+        struct Node *res = node_alloc(NODE_VEC3);
+
+        for (int i = 0; i < 3; ++i)
+            res->vec3_value[i] = interp_visit(in, n->construct_values[i])->int_value;
+
+        return res;
+    } break;
+    }
+
+    fprintf(stderr, "Interpreter error: Constructor for type %d does not exist.\n", n->construct_type);
+    exit(EXIT_FAILURE);
 }
 
 

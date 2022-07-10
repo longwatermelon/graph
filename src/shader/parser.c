@@ -250,38 +250,53 @@ struct Node *parser_parse_constructor(struct Parser *p)
     int type = node_str2nt(p->prev->value);
     parser_expect(p, TT_LPAREN);
 
-    switch (type)
+    struct Node *n = node_alloc(NODE_CONSTRUCTOR);
+    n->construct_type = type;
+
+    while (p->curr->type != TT_RPAREN)
     {
-    case NODE_INT:
-    {
-        struct Node *n = parser_parse_int(p);
-        parser_expect(p, TT_RPAREN);
-        return n;
-    } break;
-    case NODE_VEC3:
-    {
-        struct Node *n = node_alloc(NODE_VEC3);
+        n->construct_values = realloc(n->construct_values, sizeof(struct Node*) * ++n->construct_nvalues);
+        n->construct_values[n->construct_nvalues - 1] = parser_parse_expr(p);
 
-        n->vec3_value[0] = atoi(p->curr->value);
-        parser_expect(p, TT_INT);
-        parser_expect(p, TT_COMMA);
-
-        n->vec3_value[1] = atoi(p->curr->value);
-        parser_expect(p, TT_INT);
-        parser_expect(p, TT_COMMA);
-
-        n->vec3_value[2] = atoi(p->curr->value);
-        parser_expect(p, TT_INT);
-        parser_expect(p, TT_RPAREN);
-
-        return n;
-    } break;
-    case NODE_VOID:
-        fprintf(stderr, "Error: Can't construct variable of type void.\n");
-        exit(EXIT_FAILURE);
+        if (p->curr->type != TT_RPAREN)
+            parser_expect(p, TT_COMMA);
     }
 
-    fprintf(stderr, "Unrecognized constructor type '%s'.\n", p->prev->value);
-    exit(EXIT_FAILURE);
+    parser_expect(p, TT_RPAREN);
+    return n;
+
+/*     switch (type) */
+/*     { */
+/*     case NODE_INT: */
+/*     { */
+/*         struct Node *n = parser_parse_int(p); */
+/*         parser_expect(p, TT_RPAREN); */
+/*         return n; */
+/*     } break; */
+/*     case NODE_VEC3: */
+/*     { */
+/*         struct Node *n = node_alloc(NODE_VEC3); */
+
+/*         n->vec3_value[0] = atoi(p->curr->value); */
+/*         parser_expect(p, TT_INT); */
+/*         parser_expect(p, TT_COMMA); */
+
+/*         n->vec3_value[1] = atoi(p->curr->value); */
+/*         parser_expect(p, TT_INT); */
+/*         parser_expect(p, TT_COMMA); */
+
+/*         n->vec3_value[2] = atoi(p->curr->value); */
+/*         parser_expect(p, TT_INT); */
+/*         parser_expect(p, TT_RPAREN); */
+
+/*         return n; */
+/*     } break; */
+/*     case NODE_VOID: */
+/*         fprintf(stderr, "Error: Can't construct variable of type void.\n"); */
+/*         exit(EXIT_FAILURE); */
+/*     } */
+
+/*     fprintf(stderr, "Unrecognized constructor type '%s'.\n", p->prev->value); */
+/*     exit(EXIT_FAILURE); */
 }
 

@@ -30,9 +30,9 @@ int main(int argc, char **argv)
     graph_bind_buffer(b);
 
     float verts[] = {
-        100.f, 100.f, 0.f,
-        200.f, 100.f, 0.f,
-        200.f, 200.f, 0.f
+        0.f, 0.f, 0.f,
+        255.f, 0.f, 0.f,
+        255.f, 255.f, 0.f
     };
 
     graph_buffer_data(sizeof(verts), verts);

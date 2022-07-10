@@ -16,6 +16,7 @@ enum
     NODE_COMPOUND,
     NODE_PARAM,
     NODE_ASSIGN,
+    NODE_CONSTRUCTOR,
     NODE_NOOP
 };
 
@@ -57,6 +58,11 @@ struct Node
 
     // assign
     struct Node *assign_left, *assign_right;
+
+    // constructor
+    int construct_type;
+    struct Node **construct_values;
+    size_t construct_nvalues;
 
     // int
     int int_value;
