@@ -62,6 +62,9 @@ void shader_insert_runtime_inputs(struct Shader *s, struct Interpreter *in)
                     case NODE_VEC3:
                         glm_vec3_copy(input->vardef_value->vec3_value, def->vardef_value->vec3_value);
                         break;
+                    case NODE_FLOAT:
+                        def->vardef_value->float_value = input->vardef_value->float_value;
+                        break;
                     }
 
                     break;
@@ -85,6 +88,14 @@ void shader_add_input_vec3(struct Shader *s, const char *name, vec3 v)
     struct Node *n = shader_new_input(s, name, NODE_VEC3);
     n->vardef_value = node_alloc(NODE_VEC3);
     glm_vec3_copy(v, n->vardef_value->vec3_value);
+}
+
+
+void shader_add_input_float(struct Shader *s, const char *name, float f)
+{
+    struct Node *n = shader_new_input(s, name, NODE_FLOAT);
+    n->vardef_value = node_alloc(NODE_FLOAT);
+    n->vardef_value->float_value = f;
 }
 
 

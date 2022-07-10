@@ -1,10 +1,10 @@
 in vec3 i_pos;
-in int i_x;
 in int i_y;
+in int i_x;
 out vec3 gr_color;
 
 void main()
 {
-    gr_color = vec3(i_x, i_y, 100);
+    gr_color = vec3(i_x, i_y, 100.0);
 }
 

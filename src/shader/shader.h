@@ -22,6 +22,7 @@ void shader_insert_runtime_inputs(struct Shader *s, struct Interpreter *in);
 
 void shader_add_input_int(struct Shader *s, const char *name, int i);
 void shader_add_input_vec3(struct Shader *s, const char *name, vec3 v);
+void shader_add_input_float(struct Shader *s, const char *name, float f);
 struct Node *shader_new_input(struct Shader *s, const char *name, int type);
 void shader_clear_inputs(struct Shader *s);
 

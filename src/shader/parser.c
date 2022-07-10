@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define IS_TYPE(str) (strcmp(str, "vec3") == 0 || strcmp(str, "int") == 0 || strcmp(str, "void") == 0)
+#define IS_TYPE(str) (node_str2nt(str) != -1)
 
 struct Parser *parser_alloc(const char *path)
 {
@@ -67,6 +67,7 @@ struct Node *parser_parse_expr(struct Parser *p)
     switch (p->curr->type)
     {
     case TT_INT: return parser_parse_int(p);
+    case TT_FLOAT: return parser_parse_float(p);
     case TT_ID: return parser_parse_id(p);
     }
 
@@ -79,6 +80,16 @@ struct Node *parser_parse_int(struct Parser *p)
     struct Node *n = node_alloc(NODE_INT);
     n->int_value = atoi(p->curr->value);
     parser_expect(p, TT_INT);
+
+    return n;
+}
+
+
+struct Node *parser_parse_float(struct Parser *p)
+{
+    struct Node *n = node_alloc(NODE_FLOAT);
+    n->float_value = atof(p->curr->value);
+    parser_expect(p, TT_FLOAT);
 
     return n;
 }
@@ -265,39 +276,5 @@ struct Node *parser_parse_constructor(struct Parser *p)
 
     parser_expect(p, TT_RPAREN);
     return n;
-
-/*     switch (type) */
-/*     { */
-/*     case NODE_INT: */
-/*     { */
-/*         struct Node *n = parser_parse_int(p); */
-/*         parser_expect(p, TT_RPAREN); */
-/*         return n; */
-/*     } break; */
-/*     case NODE_VEC3: */
-/*     { */
-/*         struct Node *n = node_alloc(NODE_VEC3); */
-
-/*         n->vec3_value[0] = atoi(p->curr->value); */
-/*         parser_expect(p, TT_INT); */
-/*         parser_expect(p, TT_COMMA); */
-
-/*         n->vec3_value[1] = atoi(p->curr->value); */
-/*         parser_expect(p, TT_INT); */
-/*         parser_expect(p, TT_COMMA); */
-
-/*         n->vec3_value[2] = atoi(p->curr->value); */
-/*         parser_expect(p, TT_INT); */
-/*         parser_expect(p, TT_RPAREN); */
-
-/*         return n; */
-/*     } break; */
-/*     case NODE_VOID: */
-/*         fprintf(stderr, "Error: Can't construct variable of type void.\n"); */
-/*         exit(EXIT_FAILURE); */
-/*     } */
-
-/*     fprintf(stderr, "Unrecognized constructor type '%s'.\n", p->prev->value); */
-/*     exit(EXIT_FAILURE); */
 }
 

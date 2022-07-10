@@ -42,6 +42,8 @@ struct Node *node_alloc(int type)
 
     glm_vec3_zero(n->vec3_value);
 
+    n->float_value = 0.f;
+
     return n;
 }
 
@@ -173,6 +175,10 @@ struct Node *node_copy(struct Node *src)
         for (size_t i = 0; i < n->construct_nvalues; ++i)
             n->construct_values[i] = node_copy(src->construct_values[i]);
     } break;
+    case NODE_FLOAT:
+    {
+        n->float_value = src->float_value;
+    } break;
     }
 
     return n;
@@ -184,6 +190,7 @@ int node_str2nt(const char *str)
     if (strcmp(str, "int") == 0) return NODE_INT;
     if (strcmp(str, "vec3") == 0) return NODE_VEC3;
     if (strcmp(str, "void") == 0) return NODE_VOID;
+    if (strcmp(str, "float") == 0) return NODE_FLOAT;
 
     return -1;
 }

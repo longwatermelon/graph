@@ -11,6 +11,7 @@ enum
     NODE_FUNC_CALL,
     NODE_FUNC_DEF,
     NODE_INT,
+    NODE_FLOAT,
     NODE_VEC3,
     NODE_VOID,
     NODE_COMPOUND,
@@ -72,6 +73,9 @@ struct Node
 
     // vec3
     vec3 vec3_value;
+
+    // float
+    float float_value;
 };
 
 struct Node *node_alloc(int type);

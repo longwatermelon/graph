@@ -12,6 +12,7 @@ enum
     TT_RBRACE,
     TT_EQUAL,
     TT_COMMA,
+    TT_FLOAT,
     TT_EOF
 };
 

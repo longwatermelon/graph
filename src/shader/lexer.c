@@ -64,6 +64,21 @@ char *lexer_collect_id(struct Lexer *l)
 }
 
 
+char *lexer_collect_float(struct Lexer *l)
+{
+    size_t start = l->index;
+
+    while ((isdigit(l->ch) || l->ch == '.') && l->ch != '\n' && l->ch != '\0')
+        lexer_advance(l);
+
+    char *s = malloc(sizeof(char) * (l->index - start + 1));
+    s[0] = '\0';
+    strncat(s, l->contents + start, sizeof(char) * (l->index - start));
+
+    return s;
+}
+
+
 struct Token *lexer_next_token(struct Lexer *l)
 {
     while (l->index < strlen(l->contents))
@@ -72,7 +87,17 @@ struct Token *lexer_next_token(struct Lexer *l)
             lexer_advance(l);
 
         if (isdigit(l->ch))
-            return token_alloc(TT_INT, lexer_collect_int(l));
+        {
+            size_t tmp_i = l->index;
+
+            while (isdigit(l->contents[tmp_i]))
+                ++tmp_i;
+
+            if (l->contents[tmp_i] == '.')
+                return token_alloc(TT_FLOAT, lexer_collect_float(l));
+            else
+                return token_alloc(TT_INT, lexer_collect_int(l));
+        }
 
         if (isalnum(l->ch) || l->ch == '_')
             return token_alloc(TT_ID, lexer_collect_id(l));

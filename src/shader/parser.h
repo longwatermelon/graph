@@ -20,6 +20,7 @@ struct Node *parser_parse(struct Parser *p);
 struct Node *parser_parse_expr(struct Parser *p);
 
 struct Node *parser_parse_int(struct Parser *p);
+struct Node *parser_parse_float(struct Parser *p);
 struct Node *parser_parse_id(struct Parser *p);
 
 struct Node *parser_parse_var(struct Parser *p);

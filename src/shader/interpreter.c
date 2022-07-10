@@ -65,6 +65,7 @@ struct Node *interp_visit(struct Interpreter *in, struct Node *n)
     case NODE_INT:
     case NODE_VEC3:
     case NODE_VOID:
+    case NODE_FLOAT:
         return n;
     case NODE_COMPOUND: return interp_visit_compound(in, n);
     case NODE_VAR: return interp_visit_var(in, n);
@@ -158,6 +159,7 @@ struct Node *interp_visit_assignment(struct Interpreter *in, struct Node *n)
     {
     case NODE_INT: def->vardef_value->int_value = right->int_value; break;
     case NODE_VEC3: glm_vec3_copy(right->vec3_value, def->vardef_value->vec3_value); break;
+    case NODE_FLOAT: def->vardef_value->float_value = right->float_value; break;
     default:
         fprintf(stderr, "Interpreter error: %d is not a data type.\n", def->vardef_type);
         exit(EXIT_FAILURE);
@@ -192,8 +194,36 @@ struct Node *interp_visit_constructor(struct Interpreter *in, struct Node *n)
         struct Node *res = node_alloc(NODE_VEC3);
 
         for (int i = 0; i < 3; ++i)
-            res->vec3_value[i] = interp_visit(in, n->construct_values[i])->int_value;
+        {
+            struct Node *tmp = interp_visit(in, n->construct_values[i]);
+            float value;
 
+            switch (tmp->type)
+            {
+            case NODE_INT: value = tmp->int_value; break;
+            case NODE_FLOAT: value = tmp->float_value; break;
+            default:
+                fprintf(stderr, "Interpreter error: Can't construct vec3 with element of type %d.\n",
+                        tmp->construct_type);
+                exit(EXIT_FAILURE);
+            }
+
+            res->vec3_value[i] = value;
+        }
+
+        return res;
+    } break;
+    case NODE_FLOAT:
+    {
+        if (n->construct_nvalues != 1)
+        {
+            fprintf(stderr, "Interpreter error: Expected 1 argument to float constructor but %zu were given.\n",
+                    n->construct_nvalues);
+            exit(EXIT_FAILURE);
+        }
+
+        struct Node *res = node_alloc(NODE_FLOAT);
+        res->float_value = interp_visit(in, n->construct_values[0])->float_value;
         return res;
     } break;
     }

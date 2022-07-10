@@ -21,6 +21,7 @@ void lexer_advance(struct Lexer *l);
 
 char *lexer_collect_int(struct Lexer *l);
 char *lexer_collect_id(struct Lexer *l);
+char *lexer_collect_float(struct Lexer *l);
 
 struct Token *lexer_next_token(struct Lexer *l);
 struct Token *lexer_advance_with_token(struct Lexer *l, struct Token *t);
