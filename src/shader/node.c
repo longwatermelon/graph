@@ -85,6 +85,78 @@ void node_free(struct Node *n)
 }
 
 
+struct Node *node_copy(struct Node *src)
+{
+    struct Node *n = node_alloc(src->type);
+
+    switch (src->type)
+    {
+    case NODE_VEC3:
+    {
+        glm_vec3_copy(src->vec3_value, n->vec3_value);
+    } break;
+    case NODE_FUNC_CALL:
+    {
+        n->call_name = strdup(src->call_name);
+        n->call_nargs = src->call_nargs;
+        n->call_args = malloc(sizeof(struct Node*) * n->call_nargs);
+
+        for (size_t i = 0; i < n->call_nargs; ++i)
+            n->call_args[i] = node_copy(src->call_args[i]);
+
+    } break;
+    case NODE_VAR:
+    {
+        n->var_name = strdup(src->var_name);
+    } break;
+    case NODE_VARDEF:
+    {
+        n->vardef_modifier = src->vardef_modifier;
+        n->vardef_type = src->vardef_type;
+        n->vardef_name = strdup(src->vardef_name);
+        n->vardef_value = node_copy(src->vardef_value);
+    } break;
+    case NODE_INT:
+    {
+        n->int_value = src->int_value;
+    } break;
+    case NODE_COMPOUND:
+    {
+        n->comp_nvalues = src->comp_nvalues;
+        n->comp_value = malloc(sizeof(struct Node*) * n->comp_nvalues);
+
+        for (size_t i = 0; i < n->comp_nvalues; ++i)
+            n->comp_value[i] = node_copy(src->comp_value[i]);
+
+    } break;
+    case NODE_FUNC_DEF:
+    {
+        n->fdef_type = src->fdef_type;
+        n->fdef_body = node_copy(src->fdef_body);
+        n->fdef_name = strdup(src->fdef_name);
+        n->fdef_nparams = src->fdef_nparams;
+        n->fdef_params = malloc(sizeof(struct Node*) * n->fdef_nparams);
+
+        for (size_t i = 0; i < n->fdef_nparams; ++i)
+            n->fdef_params[i] = node_copy(src->fdef_params[i]);
+
+    } break;
+    case NODE_ASSIGN:
+    {
+        n->assign_left = node_copy(src->assign_left);
+        n->assign_right = node_copy(src->assign_right);
+    } break;
+    case NODE_PARAM:
+    {
+        n->param_name = strdup(src->param_name);
+        n->param_type = src->param_type;
+    } break;
+    }
+
+    return n;
+}
+
+
 int node_str2nt(const char *str)
 {
     if (strcmp(str, "int") == 0) return NODE_INT;

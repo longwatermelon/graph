@@ -17,7 +17,8 @@ struct Interpreter *interp_alloc()
 
 void interp_free(struct Interpreter *in)
 {
-    // Interpreter doesn't own any nodes, only has references to them
+    // Interpreter copies nodes into vardefs and fdefs
+    interp_clear(in);
     free(in);
 }
 
@@ -27,6 +28,30 @@ void interp_run(struct Interpreter *in)
     struct Node *n = node_alloc(NODE_FUNC_CALL);
     n->call_name = strdup("main");
     interp_visit(in, n);
+}
+
+
+void interp_clear(struct Interpreter *in)
+{
+    for (size_t i = 0; i < in->nvardefs; ++i)
+        node_free(in->vardefs[i]);
+
+    free(in->vardefs);
+    in->vardefs = 0;
+    in->nvardefs = 0;
+
+    for (size_t i = 0; i < in->nfdefs; ++i)
+        node_free(in->fdefs[i]);
+
+    free(in->fdefs);
+    in->fdefs = 0;
+    in->nfdefs = 0;
+}
+
+
+void interp_prepare(struct Interpreter *in, struct Node *root)
+{
+    interp_visit(in, root);
 }
 
 
@@ -66,7 +91,7 @@ struct Node *interp_visit_compound(struct Interpreter *in, struct Node *n)
 struct Node *interp_visit_vardef(struct Interpreter *in, struct Node *n)
 {
     in->vardefs = realloc(in->vardefs, sizeof(struct Node*) * ++in->nvardefs);
-    in->vardefs[in->nvardefs - 1] = n;
+    in->vardefs[in->nvardefs - 1] = node_copy(n);
 
     return n;
 }
@@ -103,7 +128,7 @@ struct Node *interp_visit_call(struct Interpreter *in, struct Node *n)
 struct Node *interp_visit_fdef(struct Interpreter *in, struct Node *n)
 {
     in->fdefs = realloc(in->fdefs, sizeof(struct Node*) * ++in->nfdefs);
-    in->fdefs[in->nfdefs - 1] = n;
+    in->fdefs[in->nfdefs - 1] = node_copy(n);
 
     return n;
 }
@@ -130,7 +155,7 @@ struct Node *interp_visit_assignment(struct Interpreter *in, struct Node *n)
     switch (def->vardef_type)
     {
     case NODE_INT: def->vardef_value->int_value = right->int_value; break;
-    case NODE_VEC3: glm_vec3_copy(right->vec3_value, def->vec3_value); break;
+    case NODE_VEC3: glm_vec3_copy(right->vec3_value, def->vardef_value->vec3_value); break;
     default:
         fprintf(stderr, "Interpreter error: %d is not a data type.\n", def->vardef_type);
         exit(EXIT_FAILURE);
@@ -161,5 +186,23 @@ struct Node *interp_find_fdef(struct Interpreter *in, const char *name)
     }
 
     return 0;
+}
+
+
+struct Node **interp_output_variables(struct Interpreter *in, size_t *n)
+{
+    struct Node **outputs = 0;
+    *n = 0;
+
+    for (size_t i = 0; i < in->nvardefs; ++i)
+    {
+        if (in->vardefs[i]->vardef_modifier == VAR_OUT)
+        {
+            outputs = realloc(outputs, sizeof(struct Node*) * ++*n);
+            outputs[*n - 1] = node_copy(in->vardefs[i]);
+        }
+    }
+
+    return outputs;
 }
 

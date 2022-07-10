@@ -17,6 +17,8 @@ struct Interpreter *interp_alloc();
 void interp_free(struct Interpreter *in);
 
 void interp_run(struct Interpreter *in);
+void interp_clear(struct Interpreter *in);
+void interp_prepare(struct Interpreter *in, struct Node *root);
 
 struct Node *interp_visit(struct Interpreter *in, struct Node *n);
 struct Node *interp_visit_compound(struct Interpreter *in, struct Node *n);
@@ -29,6 +31,9 @@ struct Node *interp_visit_assignment(struct Interpreter *in, struct Node *n);
 
 struct Node *interp_find_vardef(struct Interpreter *in, const char *name);
 struct Node *interp_find_fdef(struct Interpreter *in, const char *name);
+
+// Out n
+struct Node **interp_output_variables(struct Interpreter *in, size_t *n);
 
 #endif
 

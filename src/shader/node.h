@@ -72,6 +72,8 @@ struct Node
 struct Node *node_alloc(int type);
 void node_free(struct Node *n);
 
+struct Node *node_copy(struct Node *src);
+
 // String to node type
 int node_str2nt(const char *str);
 

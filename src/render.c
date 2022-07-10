@@ -1,5 +1,6 @@
 #include "render.h"
 #include "buffer.h"
+#include "shader/shader.h"
 
 #define swapv(a, b) { \
     vec3 tmp; \
@@ -12,6 +13,8 @@ int g_w = 0, g_h = 0;
 
 uint32_t *g_scr = 0;
 float *g_zbuf = 0;
+
+struct Shader *g_shader = 0;
 
 void graph_init_renderer(int w, int h)
 {
@@ -58,7 +61,10 @@ void graph_draw(SDL_Renderer *rend)
     }
 }
 
-
+void graph_use_shader(struct Shader *s)
+{
+    g_shader = s;
+}
 
 void filled_tri(SDL_Renderer *rend, vec3 points[3])
 {
@@ -106,6 +112,14 @@ void fill_edges(vec3 a, vec3 b, RTI *l1, RTI *l2)
             }
 
             if (i >= g_w) break;
+
+            vec3 pos = { i, y, z };
+            shader_add_input_vec3(g_shader, "i_pos", pos);
+            shader_run(g_shader);
+
+            struct Node *color_node = shader_frag_outvar(g_shader, "gr_color");
+            hex = 0x000000 | (int)color_node->vardef_value->vec3_value[0] << 16 | (int)color_node->vardef_value->vec3_value[1] << 8 | (int)color_node->vardef_value->vec3_value[2];
+            /* printf("%d\n", (int)color_node->vardef_value->vec3_value[0]); */
 
             int idx = y * g_w + i;
 

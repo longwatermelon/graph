@@ -4,6 +4,6 @@ out vec3 f_color;
 void main()
 {
     vec3 gr_pos = i_pos;
-    f_color = vec3(255, 0, 0);
+    f_color = vec3(255, 0, 100);
 }
 

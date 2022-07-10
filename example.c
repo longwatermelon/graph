@@ -13,32 +13,6 @@
 
 int main(int argc, char **argv)
 {
-    struct Parser *p = parser_alloc("shaders/test.vert");
-    struct Node *root = parser_parse(p);
-
-    struct Interpreter *in = interp_alloc();
-    interp_visit(in, root);
-    interp_run(in);
-
-    node_free(root);
-    parser_free(p);
-    interp_free(in);
-    /* char *contents = util_read_file("shaders/test.vert"); */
-    /* struct Lexer *l = lexer_alloc(contents); */
-
-    /* struct Token *t = 0; */
-
-    /* while ((t = lexer_next_token(l))->type != TT_EOF) */
-    /* { */
-    /*     printf("Type %d value %s\n", t->type, t->value); */
-    /*     token_free(t); */
-    /* } */
-
-    /* token_free(t); */
-    /* lexer_free(l); */
-
-    return 0;
-
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
 
@@ -62,6 +36,9 @@ int main(int argc, char **argv)
     };
 
     graph_buffer_data(sizeof(verts), verts);
+
+    struct Shader *shader = shader_alloc("shaders/test.vert", "shaders/test.frag");
+    graph_use_shader(shader);
 
     while (running)
     {
@@ -87,6 +64,7 @@ int main(int argc, char **argv)
     }
 
     graph_free_renderer();
+    shader_free(shader);
 
     SDL_DestroyRenderer(r);
     SDL_DestroyWindow(w);
