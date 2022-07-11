@@ -92,18 +92,8 @@ struct Node *visitor_visit_assignment(struct Node *n)
         exit(EXIT_FAILURE);
     }
 
-    switch (def->vardef_type)
-    {
-    case NODE_INT: def->vardef_value->int_value = right->int_value; break;
-    case NODE_VEC:
-        node_free(def->vardef_value);
-        def->vardef_value = node_copy(right);
-        break;
-    case NODE_FLOAT: def->vardef_value->float_value = right->float_value; break;
-    default:
-        fprintf(stderr, "Interpreter error: %d is not a data type.\n", def->vardef_type);
-        exit(EXIT_FAILURE);
-    }
+    node_free(def->vardef_value);
+    def->vardef_value = node_copy(right);
 
     return def;
 }
