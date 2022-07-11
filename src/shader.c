@@ -30,7 +30,7 @@ void shader_free(struct Shader *s)
 
 void shader_run(struct Shader *s)
 {
-    interp_clear(s->in);
+    scope_clear(s->in->scope);
 
     interp_prepare(s->in, s->root);
     shader_insert_runtime_inputs(s, s->in);
@@ -42,9 +42,11 @@ void shader_run(struct Shader *s)
 
 void shader_insert_runtime_inputs(struct Shader *s, struct Interpreter *in)
 {
-    for (size_t i = 0; i < in->nvardefs; ++i)
+    struct ScopeLayer *layer = &in->scope->layers[0];
+
+    for (size_t i = 0; i < layer->nvardefs; ++i)
     {
-        struct Node *def = in->vardefs[i];
+        struct Node *def = layer->vardefs[i];
 
         if (def->vardef_modifier == VAR_IN)
         {
@@ -148,12 +150,14 @@ void shader_clear_inputs(struct Shader *s)
 
 struct Node *shader_outvar(struct Shader *s, const char *name)
 {
-    for (size_t i = 0; i < s->in->nvardefs; ++i)
+    struct ScopeLayer *layer = &s->in->scope->layers[0];
+
+    for (size_t i = 0; i < layer->nvardefs; ++i)
     {
-        struct Node *def = s->in->vardefs[i];
+        struct Node *def = layer->vardefs[i];
 
         if (strcmp(def->vardef_name, name) == 0 && def->vardef_modifier == VAR_OUT)
-            return s->in->vardefs[i];
+            return layer->vardefs[i];
     }
 
     return 0;
