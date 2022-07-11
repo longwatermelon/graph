@@ -50,7 +50,7 @@ void graph_draw(SDL_Renderer *rend)
 
     struct Buffer *b = graph_buffer_bound();
 
-    for (size_t i = 0; i < b->data_size; i += 9 * sizeof(float))
+    for (size_t i = 0; i < b->data_len; i += 9)
     {
         vec3 points[3];
         memcpy(points[0], b->data + i, 3 * sizeof(float));

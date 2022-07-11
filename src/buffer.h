@@ -6,7 +6,7 @@
 struct Buffer
 {
     float *data;
-    size_t data_size;
+    size_t data_len;
 };
 
 struct Buffer *graph_gen_buffer();
