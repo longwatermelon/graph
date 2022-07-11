@@ -1,7 +1,7 @@
 #ifndef LIBGRAPH_RENDER_H
 #define LIBGRAPH_RENDER_H
 
-#include "shader/shader.h"
+#include "shader.h"
 #include <cglm/cglm.h>
 #include <SDL2/SDL.h>
 

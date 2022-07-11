@@ -1,10 +1,6 @@
 #include "graph.h"
 #include "render.h"
 #include "buffer.h"
-#include "shader/lexer.h"
-#include "shader/util.h"
-#include "shader/parser.h"
-#include "shader/interpreter.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>

@@ -1,7 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "interpreter.h"
+#include "shaderlang/interpreter.h"
 #include <limits.h>
 
 struct Shader

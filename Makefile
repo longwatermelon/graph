@@ -6,7 +6,7 @@ SRC=$(wildcard src/*.c src/*/*.c)
 OBJS=$(addprefix obj/, $(SRC:.c=.o))
 
 all:
-	mkdir -p obj/src/shader
+	mkdir -p obj/src/shaderlang
 	$(MAKE) lib
 	$(CC) $(CFLAGS) example.c $(LIBS) -lgraph
 
@@ -17,5 +17,5 @@ obj/src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
 
 clean:
-	-rm -rf obj/src libgraph.a a.out
+	-rm -rf obj/ libgraph.a a.out
 

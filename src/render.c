@@ -1,6 +1,6 @@
 #include "render.h"
 #include "buffer.h"
-#include "shader/shader.h"
+#include "shader.h"
 
 #define swapv(a, b) { \
     vec3 tmp; \
