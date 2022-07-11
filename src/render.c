@@ -51,18 +51,6 @@ void graph_draw(SDL_Renderer *rend)
 {
     graph_reset_renderer();
     shader_run_vert(g_shader, rend);
-
-/*     struct Buffer *b = graph_buffer_bound(); */
-
-/*     for (size_t i = 0; i < b->data_len; i += 9) */
-/*     { */
-/*         vec3 points[3]; */
-/*         memcpy(points[0], b->data + i, 3 * sizeof(float)); */
-/*         memcpy(points[1], b->data + i + 3, 3 * sizeof(float)); */
-/*         memcpy(points[2], b->data + i + 6, 3 * sizeof(float)); */
-
-/*         filled_tri(rend, points); */
-/*     } */
 }
 
 void graph_use_shader(struct Shader *s)

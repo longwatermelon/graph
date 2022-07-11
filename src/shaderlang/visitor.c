@@ -1,20 +1,6 @@
 #include "visitor.h"
 #include <string.h>
 
-/* void visitor_run(struct Scope *s) */
-/* { */
-/*     struct Node *n = node_alloc(NODE_FUNC_CALL); */
-/*     n->call_name = strdup("main"); */
-/*     visitor_visit(in, n); */
-/*     node_free(n); */
-/* } */
-
-
-/* void visitor_prepare(struct Node *root) */
-/* { */
-/*     visitor_visit(in, root); */
-/* } */
-
 struct Scope *g_scope = 0;
 
 struct Node *visitor_visit(struct Node *n)
