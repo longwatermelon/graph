@@ -29,6 +29,7 @@ struct Node *interp_visit_call(struct Interpreter *in, struct Node *n);
 struct Node *interp_visit_fdef(struct Interpreter *in, struct Node *n);
 struct Node *interp_visit_assignment(struct Interpreter *in, struct Node *n);
 struct Node *interp_visit_constructor(struct Interpreter *in, struct Node *n);
+struct Node *interp_visit_vec(struct Interpreter *in, struct Node *n);
 
 struct Node *interp_find_vardef(struct Interpreter *in, const char *name);
 struct Node *interp_find_fdef(struct Interpreter *in, const char *name);

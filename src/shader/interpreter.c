@@ -63,10 +63,10 @@ struct Node *interp_visit(struct Interpreter *in, struct Node *n)
     switch (n->type)
     {
     case NODE_INT:
-    case NODE_VEC:
     case NODE_VOID:
     case NODE_FLOAT:
         return n;
+    case NODE_VEC: return interp_visit_vec(in, n);
     case NODE_COMPOUND: return interp_visit_compound(in, n);
     case NODE_VAR: return interp_visit_var(in, n);
     case NODE_VARDEF: return interp_visit_vardef(in, n);
@@ -229,6 +229,19 @@ struct Node *interp_visit_constructor(struct Interpreter *in, struct Node *n)
 
     /* fprintf(stderr, "Interpreter error: Constructor for type %d does not exist.\n", n->construct_type); */
     /* exit(EXIT_FAILURE); */
+}
+
+
+struct Node *interp_visit_vec(struct Interpreter *in, struct Node *n)
+{
+    for (size_t i = 0; i < n->vec_len; ++i)
+    {
+        struct Node *tmp = node_copy(interp_visit(in, n->vec_values[i]));
+        node_free(n->vec_values[i]);
+        n->vec_values[i] = tmp;
+    }
+
+    return n;
 }
 
 

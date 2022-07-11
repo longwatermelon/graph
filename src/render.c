@@ -115,8 +115,8 @@ void fill_edges(vec3 a, vec3 b, RTI *l1, RTI *l2)
 
             vec3 pos = { i, y, z };
             shader_add_input_vec(g_shader, "i_pos", pos, 3);
-            shader_add_input_int(g_shader, "i_x", (int)pos[0]);
-            shader_add_input_int(g_shader, "i_y", (int)pos[1]);
+            shader_add_input_float(g_shader, "i_x", pos[0] / 2.f);
+            shader_add_input_float(g_shader, "i_y", pos[1] / 2.f);
             shader_run(g_shader);
 
             struct Node *color_node = shader_outvar(g_shader, "gr_color");

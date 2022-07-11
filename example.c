@@ -31,8 +31,8 @@ int main(int argc, char **argv)
 
     float verts[] = {
         0.f, 0.f, 0.f,
-        255.f, 0.f, 0.f,
-        255.f, 255.f, 0.f
+        255.f * 2.f, 0.f, 0.f,
+        255.f * 2.f, 255.f * 2.f, 0.f
     };
 
     graph_buffer_data(sizeof(verts), verts);
