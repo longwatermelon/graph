@@ -59,8 +59,20 @@ void shader_insert_runtime_inputs(struct Shader *s, struct Interpreter *in)
                     case NODE_INT:
                         def->vardef_value->int_value = input->vardef_value->int_value;
                         break;
-                    case NODE_VEC3:
-                        glm_vec3_copy(input->vardef_value->vec3_value, def->vardef_value->vec3_value);
+                    case NODE_VEC:
+                        for (size_t i = 0; i < def->vardef_value->vec_len; ++i)
+                            node_free(def->vardef_value->vec_values[i]);
+
+                        free(def->vardef_value->vec_values);
+
+                        if (def->vardef_value->vec_len != input->vardef_value->vec_len)
+                        {
+                            def->vardef_value->vec_values = malloc(sizeof(struct Node*) * input->vardef_value->vec_len);
+                            def->vardef_value->vec_len = input->vardef_value->vec_len;
+                        }
+
+                        for (size_t i = 0; i < input->vardef_value->vec_len; ++i)
+                            def->vardef_value->vec_values[i] = node_copy(input->vardef_value->vec_values[i]);
                         break;
                     case NODE_FLOAT:
                         def->vardef_value->float_value = input->vardef_value->float_value;
@@ -83,11 +95,20 @@ void shader_add_input_int(struct Shader *s, const char *name, int i)
 }
 
 
-void shader_add_input_vec3(struct Shader *s, const char *name, vec3 v)
+void shader_add_input_vec(struct Shader *s, const char *name, float *v, size_t len)
 {
-    struct Node *n = shader_new_input(s, name, NODE_VEC3);
-    n->vardef_value = node_alloc(NODE_VEC3);
-    glm_vec3_copy(v, n->vardef_value->vec3_value);
+    struct Node *n = shader_new_input(s, name, NODE_VEC);
+    n->vardef_value = node_alloc(NODE_VEC);
+
+    n->vardef_value->vec_len = len;
+    n->vardef_value->vec_values = malloc(sizeof(struct Node*) * len);
+
+    for (size_t i = 0; i < len; ++i)
+    {
+        struct Node *num = node_alloc(NODE_FLOAT);
+        num->float_value = v[i];
+        n->vardef_value->vec_values[i] = num;
+    }
 }
 
 

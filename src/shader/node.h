@@ -12,7 +12,7 @@ enum
     NODE_FUNC_DEF,
     NODE_INT,
     NODE_FLOAT,
-    NODE_VEC3,
+    NODE_VEC,
     NODE_VOID,
     NODE_COMPOUND,
     NODE_PARAM,
@@ -63,6 +63,7 @@ struct Node
     int construct_type;
     struct Node **construct_values;
     size_t construct_nvalues;
+    struct Node *construct_out;
 
     // int
     int int_value;
@@ -72,7 +73,8 @@ struct Node
     size_t comp_nvalues;
 
     // vec3
-    vec3 vec3_value;
+    struct Node **vec_values;
+    size_t vec_len;
 
     // float
     float float_value;

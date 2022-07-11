@@ -63,7 +63,7 @@ struct Node *interp_visit(struct Interpreter *in, struct Node *n)
     switch (n->type)
     {
     case NODE_INT:
-    case NODE_VEC3:
+    case NODE_VEC:
     case NODE_VOID:
     case NODE_FLOAT:
         return n;
@@ -158,15 +158,15 @@ struct Node *interp_visit_assignment(struct Interpreter *in, struct Node *n)
     switch (def->vardef_type)
     {
     case NODE_INT: def->vardef_value->int_value = right->int_value; break;
-    case NODE_VEC3: glm_vec3_copy(right->vec3_value, def->vardef_value->vec3_value); break;
+    case NODE_VEC:
+        node_free(def->vardef_value);
+        def->vardef_value = node_copy(right);
+        break;
     case NODE_FLOAT: def->vardef_value->float_value = right->float_value; break;
     default:
         fprintf(stderr, "Interpreter error: %d is not a data type.\n", def->vardef_type);
         exit(EXIT_FAILURE);
     }
-
-    if (n->assign_right->type == NODE_CONSTRUCTOR)
-        node_free(right);
 
     return def;
 }
@@ -174,62 +174,61 @@ struct Node *interp_visit_assignment(struct Interpreter *in, struct Node *n)
 
 struct Node *interp_visit_constructor(struct Interpreter *in, struct Node *n)
 {
-    switch (n->construct_type)
-    {
-    case NODE_INT:
-    {
-        if (n->construct_nvalues != 1)
-        {
-            fprintf(stderr, "Interpreter error: Expected 1 argument to int constructor but %zu were given.\n",
-                    n->construct_nvalues);
-            exit(EXIT_FAILURE);
-        }
+    return interp_visit(in, n->construct_out);
+    /* switch (n->construct_type) */
+    /* { */
+    /* case NODE_INT: */
+    /* { */
+    /*     if (n->construct_nvalues != 1) */
+    /*     { */
+    /*         fprintf(stderr, "Interpreter error: Expected 1 argument to int constructor but %zu were given.\n", */
+    /*                 n->construct_nvalues); */
+    /*         exit(EXIT_FAILURE); */
+    /*     } */
 
-        struct Node *res = node_alloc(NODE_INT);
-        res->int_value = interp_visit(in, n->construct_values[0])->int_value;
-        return res;
-    } break;
-    case NODE_VEC3:
-    {
-        struct Node *res = node_alloc(NODE_VEC3);
+    /*     /1* struct Node *res = node_alloc(NODE_INT); *1/ */
+    /*     /1* res->int_value = interp_visit(in, n->construct_values[0])->int_value; *1/ */
+    /*     return interp_visit(in, n->construct_out); */
+    /* } break; */
+    /* case NODE_VEC: */
+    /* { */
+    /*     /1* struct Node *res = node_alloc(NODE_VEC); *1/ */
 
-        for (int i = 0; i < 3; ++i)
-        {
-            struct Node *tmp = interp_visit(in, n->construct_values[i]);
-            float value;
+    /*     /1* for (int i = 0; i < 3; ++i) *1/ */
+    /*     /1* { *1/ */
+    /*     /1*     struct Node *tmp = interp_visit(in, n->construct_values[i]); *1/ */
+    /*     /1*     float value; *1/ */
 
-            switch (tmp->type)
-            {
-            case NODE_INT: value = tmp->int_value; break;
-            case NODE_FLOAT: value = tmp->float_value; break;
-            default:
-                fprintf(stderr, "Interpreter error: Can't construct vec3 with element of type %d.\n",
-                        tmp->construct_type);
-                exit(EXIT_FAILURE);
-            }
+    /*     /1*     switch (tmp->type) *1/ */
+    /*     /1*     { *1/ */
+    /*     /1*     case NODE_INT: value = tmp->int_value; break; *1/ */
+    /*     /1*     case NODE_FLOAT: value = tmp->float_value; break; *1/ */
+    /*     /1*     default: *1/ */
+    /*     /1*         fprintf(stderr, "Interpreter error: Can't construct vec3 with element of type %d.\n", *1/ */
+    /*     /1*                 tmp->construct_type); *1/ */
+    /*     /1*         exit(EXIT_FAILURE); *1/ */
+    /*     /1*     } *1/ */
 
-            res->vec3_value[i] = value;
-        }
+    /*     /1*     res->vec3_value[i] = value; *1/ */
+    /*     /1* } *1/ */
+    /* } break; */
+    /* case NODE_FLOAT: */
+    /* { */
+    /*     if (n->construct_nvalues != 1) */
+    /*     { */
+    /*         fprintf(stderr, "Interpreter error: Expected 1 argument to float constructor but %zu were given.\n", */
+    /*                 n->construct_nvalues); */
+    /*         exit(EXIT_FAILURE); */
+    /*     } */
 
-        return res;
-    } break;
-    case NODE_FLOAT:
-    {
-        if (n->construct_nvalues != 1)
-        {
-            fprintf(stderr, "Interpreter error: Expected 1 argument to float constructor but %zu were given.\n",
-                    n->construct_nvalues);
-            exit(EXIT_FAILURE);
-        }
+    /*     struct Node *res = node_alloc(NODE_FLOAT); */
+    /*     res->float_value = interp_visit(in, n->construct_values[0])->float_value; */
+    /*     return res; */
+    /* } break; */
+    /* } */
 
-        struct Node *res = node_alloc(NODE_FLOAT);
-        res->float_value = interp_visit(in, n->construct_values[0])->float_value;
-        return res;
-    } break;
-    }
-
-    fprintf(stderr, "Interpreter error: Constructor for type %d does not exist.\n", n->construct_type);
-    exit(EXIT_FAILURE);
+    /* fprintf(stderr, "Interpreter error: Constructor for type %d does not exist.\n", n->construct_type); */
+    /* exit(EXIT_FAILURE); */
 }
 
 

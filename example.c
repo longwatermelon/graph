@@ -63,6 +63,8 @@ int main(int argc, char **argv)
         SDL_RenderPresent(r);
     }
 
+    SDL_DestroyTexture(scr);
+
     graph_free_renderer();
     shader_free(shader);
 

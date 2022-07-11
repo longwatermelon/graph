@@ -34,13 +34,15 @@ struct Node *node_alloc(int type)
     n->construct_type = -1;
     n->construct_nvalues = 0;
     n->construct_values = 0;
+    n->construct_out = 0;
 
     n->int_value = 0;
 
     n->comp_nvalues = 0;
     n->comp_value = 0;
 
-    glm_vec3_zero(n->vec3_value);
+    n->vec_values = 0;
+    n->vec_len = 0;
 
     n->float_value = 0.f;
 
@@ -63,6 +65,7 @@ void node_free(struct Node *n)
     if (n->assign_left) node_free(n->assign_left);
     if (n->assign_right) node_free(n->assign_right);
     if (n->fdef_body) node_free(n->fdef_body);
+    if (n->construct_out) node_free(n->construct_out);
 
     if (n->call_args)
     {
@@ -96,6 +99,14 @@ void node_free(struct Node *n)
         free(n->construct_values);
     }
 
+    if (n->vec_values)
+    {
+        for (size_t i = 0; i < n->vec_len; ++i)
+            node_free(n->vec_values[i]);
+
+        free(n->vec_values);
+    }
+
     free(n);
 }
 
@@ -106,9 +117,13 @@ struct Node *node_copy(struct Node *src)
 
     switch (src->type)
     {
-    case NODE_VEC3:
+    case NODE_VEC:
     {
-        glm_vec3_copy(src->vec3_value, n->vec3_value);
+        n->vec_len = src->vec_len;
+        n->vec_values = malloc(sizeof(struct Node*) * n->vec_len);
+
+        for (size_t i = 0; i < n->vec_len; ++i)
+            n->vec_values[i] = node_copy(src->vec_values[i]);
     } break;
     case NODE_FUNC_CALL:
     {
@@ -118,7 +133,6 @@ struct Node *node_copy(struct Node *src)
 
         for (size_t i = 0; i < n->call_nargs; ++i)
             n->call_args[i] = node_copy(src->call_args[i]);
-
     } break;
     case NODE_VAR:
     {
@@ -169,6 +183,7 @@ struct Node *node_copy(struct Node *src)
     case NODE_CONSTRUCTOR:
     {
         n->construct_type = src->construct_type;
+        n->construct_out = node_copy(src->construct_out);
         n->construct_nvalues = src->construct_nvalues;
         n->construct_values = malloc(sizeof(struct Node*) * n->construct_nvalues);
 
@@ -188,7 +203,7 @@ struct Node *node_copy(struct Node *src)
 int node_str2nt(const char *str)
 {
     if (strcmp(str, "int") == 0) return NODE_INT;
-    if (strcmp(str, "vec3") == 0) return NODE_VEC3;
+    if (strncmp(str, "vec", 3) == 0) return NODE_VEC;
     if (strcmp(str, "void") == 0) return NODE_VOID;
     if (strcmp(str, "float") == 0) return NODE_FLOAT;
 

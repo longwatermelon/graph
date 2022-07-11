@@ -114,13 +114,13 @@ void fill_edges(vec3 a, vec3 b, RTI *l1, RTI *l2)
             if (i >= g_w) break;
 
             vec3 pos = { i, y, z };
-            shader_add_input_vec3(g_shader, "i_pos", pos);
+            shader_add_input_vec(g_shader, "i_pos", pos, 3);
             shader_add_input_int(g_shader, "i_x", (int)pos[0]);
             shader_add_input_int(g_shader, "i_y", (int)pos[1]);
             shader_run(g_shader);
 
             struct Node *color_node = shader_outvar(g_shader, "gr_color");
-            hex = 0x000000 | (int)color_node->vardef_value->vec3_value[0] << 16 | (int)color_node->vardef_value->vec3_value[1] << 8 | (int)color_node->vardef_value->vec3_value[2];
+            hex = 0x000000 | (int)color_node->vardef_value->vec_values[0]->float_value << 16 | (int)color_node->vardef_value->vec_values[1]->float_value << 8 | (int)color_node->vardef_value->vec_values[2]->float_value;
             /* printf("%d\n", (int)color_node->vardef_value->vec3_value[0]); */
 
             int idx = y * g_w + i;

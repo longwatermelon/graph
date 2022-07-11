@@ -260,6 +260,10 @@ struct Node *parser_parse_constructor(struct Parser *p)
 {
     // On lparen
     int type = node_str2nt(p->prev->value);
+    // For vec
+    size_t expect_len = p->prev->value[3] - '0';
+    char *name = strdup(p->prev->value);
+
     parser_expect(p, TT_LPAREN);
 
     struct Node *n = node_alloc(NODE_CONSTRUCTOR);
@@ -275,6 +279,34 @@ struct Node *parser_parse_constructor(struct Parser *p)
     }
 
     parser_expect(p, TT_RPAREN);
+
+    switch (type)
+    {
+    case NODE_FLOAT:
+    case NODE_INT:
+    {
+        n->construct_out = node_copy(n->construct_values[0]);
+    } break;
+    case NODE_VEC:
+    {
+        if (expect_len != n->construct_nvalues)
+        {
+            fprintf(stderr, "Parser error: Constructor of type '%s' does not take %zu args - "
+                    "%zu were expected.\n",
+                    name, n->construct_nvalues, expect_len);
+            exit(EXIT_FAILURE);
+        }
+
+        n->construct_out = node_alloc(NODE_VEC);
+        n->construct_out->vec_len = n->construct_nvalues;
+        n->construct_out->vec_values = malloc(sizeof(struct Node*) * n->construct_out->vec_len);
+
+        for (size_t i = 0; i < n->construct_out->vec_len; ++i)
+            n->construct_out->vec_values[i] = node_copy(n->construct_values[i]);
+    } break;
+    }
+
+    free(name);
     return n;
 }
 
