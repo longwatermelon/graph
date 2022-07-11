@@ -5,15 +5,18 @@
 struct Shader *shader_alloc(const char *path)
 {
     struct Shader *s = malloc(sizeof(struct Shader));
-    strcpy(s->path, path);
 
-    s->in = interp_alloc();
+    s->inputs = 0;
+    s->ninputs = 0;
+
+    s->scope = scope_alloc();
 
     struct Parser *parser = parser_alloc(path);
     s->root = parser_parse(parser);
     parser_free(parser);
 
-    interp_prepare(s->in, s->root);
+    visitor_bind_scope(s->scope);
+    visitor_visit(s->root);
 
     return s;
 }
@@ -21,7 +24,7 @@ struct Shader *shader_alloc(const char *path)
 
 void shader_free(struct Shader *s)
 {
-    interp_free(s->in);
+    scope_free(s->scope);
     node_free(s->root);
 
     free(s);
@@ -30,19 +33,24 @@ void shader_free(struct Shader *s)
 
 void shader_run(struct Shader *s)
 {
-    scope_clear(s->in->scope);
+    scope_clear(s->scope);
+    visitor_visit(s->root);
+    shader_insert_runtime_inputs(s);
 
-    interp_prepare(s->in, s->root);
-    shader_insert_runtime_inputs(s, s->in);
-    interp_run(s->in);
+    // Construct main call
+    struct Node *call = node_alloc(NODE_FUNC_CALL);
+    call->call_name = strdup("main");
+    visitor_visit(call);
 
+    node_free(call);
     shader_clear_inputs(s);
 }
 
 
-void shader_insert_runtime_inputs(struct Shader *s, struct Interpreter *in)
+void shader_insert_runtime_inputs(struct Shader *s)
 {
-    struct ScopeLayer *layer = &in->scope->layers[0];
+    struct Scope *scope = visitor_scope_bound();
+    struct ScopeLayer *layer = &scope->layers[0];
 
     for (size_t i = 0; i < layer->nvardefs; ++i)
     {
@@ -150,7 +158,8 @@ void shader_clear_inputs(struct Shader *s)
 
 struct Node *shader_outvar(struct Shader *s, const char *name)
 {
-    struct ScopeLayer *layer = &s->in->scope->layers[0];
+    struct Scope *scope = visitor_scope_bound();
+    struct ScopeLayer *layer = &scope->layers[0];
 
     for (size_t i = 0; i < layer->nvardefs; ++i)
     {
