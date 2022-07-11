@@ -26,8 +26,8 @@ int main(int argc, char **argv)
     graph_bind_buffer(b);
 
     float verts[] = {
-        0.f, 0.f, 0.f,
-        255.f * 2.f, 0.f, 0.f,
+        0.f, 120.f, 0.f,
+        255.f * 2.f, 100.f, 0.f,
         255.f * 2.f, 255.f * 2.f, 0.f
     };
 

@@ -2,11 +2,11 @@
 #include "buffer.h"
 #include "shader.h"
 
-#define swapv(a, b) { \
+#define swapv(v1, v2) { \
     vec3 tmp; \
-    glm_vec3_copy(a, tmp); \
-    glm_vec3_copy(b, a); \
-    glm_vec3_copy(b, tmp); \
+    glm_vec3_copy(v1, tmp); \
+    glm_vec3_copy(v2, v1); \
+    glm_vec3_copy(tmp, v2); \
 }
 
 int g_w = 0, g_h = 0;
