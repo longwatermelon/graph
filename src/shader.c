@@ -64,30 +64,8 @@ void shader_insert_runtime_inputs(struct Shader *s)
 
                 if (strcmp(def->vardef_name, input->vardef_name) == 0)
                 {
-                    switch (def->vardef_type)
-                    {
-                    case NODE_INT:
-                        def->vardef_value->int_value = input->vardef_value->int_value;
-                        break;
-                    case NODE_VEC:
-                        for (size_t i = 0; i < def->vardef_value->vec_len; ++i)
-                            node_free(def->vardef_value->vec_values[i]);
-
-                        free(def->vardef_value->vec_values);
-
-                        if (def->vardef_value->vec_len != input->vardef_value->vec_len)
-                        {
-                            def->vardef_value->vec_values = malloc(sizeof(struct Node*) * input->vardef_value->vec_len);
-                            def->vardef_value->vec_len = input->vardef_value->vec_len;
-                        }
-
-                        for (size_t i = 0; i < input->vardef_value->vec_len; ++i)
-                            def->vardef_value->vec_values[i] = node_copy(input->vardef_value->vec_values[i]);
-                        break;
-                    case NODE_FLOAT:
-                        def->vardef_value->float_value = input->vardef_value->float_value;
-                        break;
-                    }
+                    node_free(def->vardef_value);
+                    def->vardef_value = node_copy(input->vardef_value);
 
                     break;
                 }
