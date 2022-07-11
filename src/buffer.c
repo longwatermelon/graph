@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-struct Buffer *g_bound = 0;
+struct Buffer *g_buffer = 0;
 
 struct Buffer *graph_gen_buffer()
 {
@@ -24,22 +24,22 @@ void graph_delete_buffer(struct Buffer *b)
 
 void graph_bind_buffer(struct Buffer *b)
 {
-    g_bound = b;
+    g_buffer = b;
 }
 
 
 void graph_buffer_data(size_t size, float *data)
 {
-    assert(g_bound != 0);
+    assert(g_buffer != 0);
 
-    g_bound->data_size = size;
-    g_bound->data = malloc(sizeof(float) * g_bound->data_size);
-    memcpy(g_bound->data, data, g_bound->data_size);
+    g_buffer->data_size = size;
+    g_buffer->data = malloc(sizeof(float) * g_buffer->data_size);
+    memcpy(g_buffer->data, data, g_buffer->data_size);
 }
 
 
 struct Buffer *graph_buffer_bound()
 {
-    return g_bound;
+    return g_buffer;
 }
 

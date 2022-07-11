@@ -1,7 +1,7 @@
 #include "attrib.h"
 #include <stdlib.h>
 
-struct AttribLayout *g_bound = 0;
+struct AttribLayout *g_atl = 0;
 
 struct AttribLayout *graph_gen_atl(size_t stride)
 {
@@ -25,22 +25,22 @@ void graph_delete_atl(struct AttribLayout *atl)
 void graph_atl_add(int count)
 {
     int offset = 0;
-    for (size_t i = 0; i < g_bound->len; ++i)
-        offset += g_bound->layout[i].offset;
+    for (size_t i = 0; i < g_atl->len; ++i)
+        offset += g_atl->layout[i].offset;
 
-    g_bound->layout = realloc(g_bound->layout, sizeof(struct AttribLayoutElement) * ++g_bound->len);
-    g_bound->layout[g_bound->len - 1] = (struct AttribLayoutElement){ offset, count };
+    g_atl->layout = realloc(g_atl->layout, sizeof(struct AttribLayoutElement) * ++g_atl->len);
+    g_atl->layout[g_atl->len - 1] = (struct AttribLayoutElement){ offset, count };
 }
 
 
 void graph_bind_atl(struct AttribLayout *atl)
 {
-    g_bound = atl;
+    g_atl = atl;
 }
 
 
 struct AttribLayout *graph_atl_bound()
 {
-    return g_bound;
+    return g_atl;
 }
 
