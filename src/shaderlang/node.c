@@ -1,4 +1,5 @@
 #include "node.h"
+#include "visitor.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -12,6 +13,7 @@ struct Node *node_alloc(int type)
     n->vardef_value = 0;
     n->vardef_modifier = VAR_REG;
     n->vardef_type = -1;
+    n->vardef_layout_loc = -1;
 
     n->var_name = 0;
 
@@ -144,6 +146,7 @@ struct Node *node_copy(struct Node *src)
         n->vardef_type = src->vardef_type;
         n->vardef_name = strdup(src->vardef_name);
         n->vardef_value = node_copy(src->vardef_value);
+        n->vardef_layout_loc = src->vardef_layout_loc;
     } break;
     case NODE_INT:
     {
@@ -208,5 +211,12 @@ int node_str2nt(const char *str)
     if (strcmp(str, "float") == 0) return NODE_FLOAT;
 
     return -1;
+}
+
+
+void node_to_vec(struct Node *vec, float *out)
+{
+    for (size_t i = 0; i < vec->vec_len; ++i)
+        out[i] = visitor_visit(vec->vec_values[i])->float_value;
 }
 

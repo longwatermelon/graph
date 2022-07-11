@@ -24,7 +24,8 @@ enum
 {
     VAR_REG,
     VAR_IN,
-    VAR_OUT
+    VAR_OUT,
+    VAR_LAYOUT
 };
 
 struct Node
@@ -36,6 +37,7 @@ struct Node
     struct Node *vardef_value;
     int vardef_modifier;
     int vardef_type;
+    int vardef_layout_loc;
 
     // var
     char *var_name;
@@ -87,6 +89,10 @@ struct Node *node_copy(struct Node *src);
 
 // String to node type
 int node_str2nt(const char *str);
+
+// Out: out
+// Node parameter must be of type NODE_VEC
+void node_to_vec(struct Node *vec, float *out);
 
 #endif
 

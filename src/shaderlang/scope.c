@@ -60,6 +60,31 @@ struct Node *scope_find_vardef(struct Scope *s, const char *name, bool error)
 }
 
 
+struct Node **scope_get_vardef_type(struct Scope *s, int type, size_t *n)
+{
+    struct Node **defs = 0;
+    *n = 0;
+
+    for (size_t i = 0; i < s->nlayers; ++i)
+    {
+        struct ScopeLayer *layer = &s->layers[i];
+
+        for (size_t j = 0; j < layer->nvardefs; ++j)
+        {
+            struct Node *def = layer->vardefs[j];
+
+            if (def->vardef_modifier == type)
+            {
+                defs = realloc(defs, sizeof(struct Node*) * ++*n);
+                defs[*n - 1] = def;
+            }
+        }
+    }
+
+    return defs;
+}
+
+
 struct Node *scope_find_fdef(struct Scope *s, const char *name, bool error)
 {
     for (size_t i = 0; i < s->nlayers; ++i)

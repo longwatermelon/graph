@@ -111,6 +111,18 @@ struct Node *parser_parse_id(struct Parser *p)
         n->vardef_modifier = VAR_OUT;
         return n;
     }
+    else if (strcmp(p->curr->value, "layout") == 0)
+    {
+        parser_expect(p, TT_ID);
+        int loc = atoi(p->curr->value);
+        parser_expect(p, TT_INT);
+
+        struct Node *n = parser_parse_vardef(p);
+        n->vardef_modifier = VAR_LAYOUT;
+        n->vardef_layout_loc = loc;
+
+        return n;
+    }
 
     if (IS_TYPE(p->curr->value))
         return parser_parse_vardef(p);
@@ -138,6 +150,11 @@ struct Node *parser_parse_var(struct Parser *p)
 struct Node *parser_parse_vardef(struct Parser *p)
 {
     int type = node_str2nt(p->curr->value);
+
+    int vlen;
+    if (type == NODE_VEC)
+        vlen = p->curr->value[3] - '0';
+
     parser_expect(p, TT_ID);
 
     if (p->curr->type == TT_LPAREN)
@@ -171,6 +188,15 @@ struct Node *parser_parse_vardef(struct Parser *p)
         n->vardef_type = type;
         // Default value allocation
         n->vardef_value = node_alloc(n->vardef_type);
+
+        if (type == NODE_VEC)
+        {
+            n->vardef_value->vec_len = vlen;
+            n->vardef_value->vec_values = malloc(sizeof(struct Node*) * vlen);
+
+            for (size_t i = 0; i < vlen; ++i)
+                n->vardef_value->vec_values[i] = node_alloc(NODE_FLOAT);
+        }
 
         return n;
     }

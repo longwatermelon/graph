@@ -2,11 +2,14 @@
 #include "buffer.h"
 #include "shader.h"
 
-#define swapv(v1, v2) { \
-    vec3 tmp; \
-    glm_vec3_copy(v1, tmp); \
-    glm_vec3_copy(v2, v1); \
-    glm_vec3_copy(tmp, v2); \
+#define swapv(v1, v2, a, b) { \
+    struct VertFragInfo *tmp = v1; \
+    v1 = v2; \
+    v2 = tmp; \
+    vec3 tmpv; \
+    glm_vec3_copy(a, tmpv); \
+    glm_vec3_copy(b, a); \
+    glm_vec3_copy(tmpv, b); \
 }
 
 int g_w = 0, g_h = 0;
@@ -47,18 +50,19 @@ void graph_render_result(SDL_Texture *tex)
 void graph_draw(SDL_Renderer *rend)
 {
     graph_reset_renderer();
+    shader_run_vert(g_shader, rend);
 
-    struct Buffer *b = graph_buffer_bound();
+/*     struct Buffer *b = graph_buffer_bound(); */
 
-    for (size_t i = 0; i < b->data_len; i += 9)
-    {
-        vec3 points[3];
-        memcpy(points[0], b->data + i, 3 * sizeof(float));
-        memcpy(points[1], b->data + i + 3, 3 * sizeof(float));
-        memcpy(points[2], b->data + i + 6, 3 * sizeof(float));
+/*     for (size_t i = 0; i < b->data_len; i += 9) */
+/*     { */
+/*         vec3 points[3]; */
+/*         memcpy(points[0], b->data + i, 3 * sizeof(float)); */
+/*         memcpy(points[1], b->data + i + 3, 3 * sizeof(float)); */
+/*         memcpy(points[2], b->data + i + 6, 3 * sizeof(float)); */
 
-        filled_tri(rend, points);
-    }
+/*         filled_tri(rend, points); */
+/*     } */
 }
 
 void graph_use_shader(struct Shader *s)
@@ -66,16 +70,16 @@ void graph_use_shader(struct Shader *s)
     g_shader = s;
 }
 
-void filled_tri(SDL_Renderer *rend, vec3 points[3])
+void graph_render_draw_tri(SDL_Renderer *rend, struct VertFragInfo *points[3])
 {
     vec3 a, b, c;
-    glm_vec3_copy(points[0], a);
-    glm_vec3_copy(points[1], b);
-    glm_vec3_copy(points[2], c);
+    glm_vec3_copy(points[0]->pos, a);
+    glm_vec3_copy(points[1]->pos, b);
+    glm_vec3_copy(points[2]->pos, c);
 
-    if (a[1] > b[1]) swapv(a, b);
-    if (a[1] > c[1]) swapv(a, c);
-    if (b[1] > c[1]) swapv(b, c);
+    if (a[1] > b[1]) swapv(points[0], points[1], a, b);
+    if (a[1] > c[1]) swapv(points[0], points[2], a, c);
+    if (b[1] > c[1]) swapv(points[1], points[2], b, c);
 
     SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
 
@@ -83,14 +87,16 @@ void filled_tri(SDL_Renderer *rend, vec3 points[3])
     RTI r_ab = { a[0], (b[1] - a[1]) / (b[0] - a[0]), a[2], (b[2] - a[2]) / (b[1] - a[1]) };
     RTI r_bc = { b[0], (c[1] - b[1]) / (c[0] - b[0]), b[2], (c[2] - b[2]) / (c[1] - b[1]) };
 
-    fill_edges(a, b, &r_ac, &r_ab);
-    fill_edges(b, c, &r_ac, &r_bc);
+    fill_edges(points[0], points[1], &r_ac, &r_ab);
+    fill_edges(points[1], points[2], &r_ac, &r_bc);
 }
 
 
-void fill_edges(vec3 a, vec3 b, RTI *l1, RTI *l2)
+void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *l2)
 {
-    uint32_t hex = 0xFFFFFFFF;
+    vec3 a, b;
+    glm_vec3_copy(va->pos, a);
+    glm_vec3_copy(vb->pos, b);
 
     for (int y = a[1]; y < b[1]; ++y)
     {
@@ -113,14 +119,14 @@ void fill_edges(vec3 a, vec3 b, RTI *l1, RTI *l2)
 
             if (i >= g_w) break;
 
-            vec3 pos = { i, y, z };
-            shader_add_input_vec(g_shader, "i_pos", pos, 3);
-            shader_add_input_float(g_shader, "i_x", pos[0] / 2.f);
-            shader_add_input_float(g_shader, "i_y", pos[1] / 2.f);
-            shader_run(g_shader);
+            /* vec3 pos = { i, y, z }; */
+            /* shader_add_input_vec(g_shader, "i_pos", pos, 3); */
+            /* shader_add_input_float(g_shader, "i_x", pos[0] / 2.f); */
+            /* shader_add_input_float(g_shader, "i_y", pos[1] / 2.f); */
+            shader_run_frag(g_shader);
 
-            struct Node *color_node = shader_outvar(g_shader, "gr_color");
-            hex = 0x000000 | (int)color_node->vardef_value->vec_values[0]->float_value << 16 | (int)color_node->vardef_value->vec_values[1]->float_value << 8 | (int)color_node->vardef_value->vec_values[2]->float_value;
+            struct Node *color_node = shader_outvar(g_shader, g_shader->scope_frag, "gr_color");
+            uint32_t hex = 0x000000 | (int)color_node->vardef_value->vec_values[0]->float_value << 16 | (int)color_node->vardef_value->vec_values[1]->float_value << 8 | (int)color_node->vardef_value->vec_values[2]->float_value;
             /* printf("%d\n", (int)color_node->vardef_value->vec3_value[0]); */
 
             int idx = y * g_w + i;

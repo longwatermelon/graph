@@ -1,6 +1,7 @@
 #include "graph.h"
 #include "render.h"
 #include "buffer.h"
+#include "attrib.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
@@ -33,7 +34,11 @@ int main(int argc, char **argv)
 
     graph_buffer_data(sizeof(verts), verts);
 
-    struct Shader *shader = shader_alloc("shaders/test.grsl");
+    struct AttribLayout *atl = graph_gen_atl(3);
+    graph_bind_atl(atl);
+    graph_atl_add(3);
+
+    struct Shader *shader = shader_alloc("shaders/vert.grsl", "shaders/frag.grsl");
     graph_use_shader(shader);
 
     while (running)
@@ -60,6 +65,9 @@ int main(int argc, char **argv)
     }
 
     SDL_DestroyTexture(scr);
+
+    graph_delete_buffer(b);
+    graph_delete_atl(atl);
 
     graph_free_renderer();
     shader_free(shader);
