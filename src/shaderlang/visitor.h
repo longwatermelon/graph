@@ -15,6 +15,8 @@ struct Node *visitor_visit_fdef(struct Node *n);
 struct Node *visitor_visit_assignment(struct Node *n);
 struct Node *visitor_visit_constructor(struct Node *n);
 struct Node *visitor_visit_vec(struct Node *n);
+struct Node *visitor_visit_param(struct Node *n);
+struct Node *visitor_visit_binop(struct Node *n);
 
 // Out n
 struct Node **visitor_output_variables(size_t *n);

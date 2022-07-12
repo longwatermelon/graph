@@ -84,6 +84,9 @@ struct Node *parser_parse_int(struct Parser *p)
     n->int_value = atoi(p->curr->value);
     parser_expect(p, TT_INT);
 
+    if (p->curr->type == TT_BINOP)
+        return parser_parse_binop(p, n);
+
     return n;
 }
 
@@ -93,6 +96,9 @@ struct Node *parser_parse_float(struct Parser *p)
     struct Node *n = node_alloc(NODE_FLOAT);
     n->float_value = atof(p->curr->value);
     parser_expect(p, TT_FLOAT);
+
+    if (p->curr->type == TT_BINOP)
+        return parser_parse_binop(p, n);
 
     return n;
 }
@@ -338,6 +344,27 @@ struct Node *parser_parse_constructor(struct Parser *p)
 
     free(values);
     free(name);
+    return n;
+}
+
+
+struct Node *parser_parse_binop(struct Parser *p, struct Node *left)
+{
+    struct Node *n = node_alloc(NODE_BINOP);
+
+    switch (p->curr->value[0])
+    {
+    case '+': n->op = BINOP_ADD; break;
+    default:
+        fprintf(stderr, "[parser_parse_binop] Error: Operator '%c' not defined.\n", p->curr->value[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    parser_expect(p, TT_BINOP);
+
+    n->op_l = left;
+    n->op_r = parser_parse_expr(p);
+
     return n;
 }
 

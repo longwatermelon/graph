@@ -29,6 +29,7 @@ struct Node *parser_parse_call(struct Parser *p);
 struct Node *parser_parse_fdef(struct Parser *p, NodeType type, char *name);
 struct Node *parser_parse_assign(struct Parser *p);
 struct Node *parser_parse_constructor(struct Parser *p);
+struct Node *parser_parse_binop(struct Parser *p, struct Node *left);
 
 #endif
 

@@ -21,6 +21,8 @@ struct Node *visitor_visit(struct Node *n)
     case NODE_FUNC_DEF: return visitor_visit_fdef(n);
     case NODE_ASSIGN: return visitor_visit_assignment(n);
     case NODE_CONSTRUCTOR: return visitor_visit_constructor(n);
+    case NODE_PARAM: return visitor_visit_param(n);
+    case NODE_BINOP: return visitor_visit_binop(n);
     }
 
     fprintf(stderr, "Interpreter error: Uncaught statement of node type %d.\n",
@@ -101,6 +103,45 @@ struct Node *visitor_visit_vec(struct Node *n)
     }
 
     return n;
+}
+
+
+struct Node *visitor_visit_param(struct Node *n)
+{
+    struct Node *def = scope_find_vardef(g_scope, n->param_name, true);
+    return visitor_visit(def->vardef_value);
+}
+
+
+struct Node *visitor_visit_binop(struct Node *n)
+{
+    struct Node *l = visitor_visit(n->op_l);
+    struct Node *r = visitor_visit(n->op_r);
+
+    if (l->type != r->type)
+    {
+        fprintf(stderr, "[visitor_visit_binop] Error: Types %d and %d are incompatible.\n",
+                l->type, r->type);
+        exit(EXIT_FAILURE);
+    }
+
+    n->op_res->type = l->type;
+
+    switch (l->type)
+    {
+    case NODE_FLOAT:
+        n->op_res->float_value = l->float_value + r->float_value;
+        break;
+    case NODE_INT:
+        n->op_res->int_value = l->int_value + r->int_value;
+        break;
+    default:
+        fprintf(stderr, "[visitor_visit_binop] Error: %d is not a data type.\n",
+                l->type);
+        exit(EXIT_FAILURE);
+    }
+
+    return n->op_res;
 }
 
 

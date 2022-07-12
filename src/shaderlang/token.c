@@ -8,6 +8,17 @@ struct Token *token_alloc(TokenType type, char *value)
     t->type = type;
     t->value = value;
 
+    t->binop = -1;
+
+    return t;
+}
+
+
+struct Token *token_binop_alloc(BinopToken type, char *value)
+{
+    struct Token *t = token_alloc(TT_BINOP, value);
+    t->binop = type;
+
     return t;
 }
 

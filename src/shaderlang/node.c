@@ -46,6 +46,15 @@ struct Node *node_alloc(NodeType type)
 
     n->float_value = 0.f;
 
+    n->op = -1;
+    n->op_l = 0;
+    n->op_r = 0;
+
+    if (type == NODE_BINOP)
+        n->op_res = node_alloc(-1);
+    else
+        n->op_res = 0;
+
     return n;
 }
 
@@ -66,6 +75,9 @@ void node_free(struct Node *n)
     if (n->assign_right) node_free(n->assign_right);
     if (n->fdef_body) node_free(n->fdef_body);
     if (n->construct_out) node_free(n->construct_out);
+    if (n->op_l) node_free(n->op_l);
+    if (n->op_r) node_free(n->op_r);
+    if (n->op_res) node_free(n->op_res);
 
     if (n->call_args)
     {
@@ -182,6 +194,14 @@ struct Node *node_copy(struct Node *src)
     {
         n->float_value = src->float_value;
     } break;
+    case NODE_BINOP:
+    {
+        n->op_l = node_copy(src->op_l);
+        n->op_r = node_copy(src->op_r);
+        n->op = src->op;
+    } break;
+    case NODE_VOID:
+        break;
     }
 
     return n;

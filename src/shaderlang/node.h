@@ -17,8 +17,14 @@ typedef enum
     NODE_COMPOUND,
     NODE_PARAM,
     NODE_ASSIGN,
+    NODE_BINOP,
     NODE_CONSTRUCTOR
 } NodeType;
+
+typedef enum
+{
+    BINOP_ADD
+} Binop;
 
 typedef enum
 {
@@ -30,7 +36,7 @@ typedef enum
 
 struct Node
 {
-    int type;
+    NodeType type;
 
     // vardef
     char *vardef_name;
@@ -78,6 +84,11 @@ struct Node
 
     // float
     float float_value;
+
+    // binop
+    Binop op;
+    struct Node *op_l, *op_r;
+    struct Node *op_res; // Hack around no heap allocations in visitor
 };
 
 struct Node *node_alloc(NodeType type);
