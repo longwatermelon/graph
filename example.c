@@ -27,9 +27,9 @@ int main(int argc, char **argv)
     graph_bind_buffer(b);
 
     float verts[] = {
-        0.f, 120.f, 0.f,                255.f, 0.f, 0.f,
-        255.f, 200.f, 0.f,        0.f, 255.f, 0.f,
-        705.f, 600.f, 0.f,  0.f, 0.f, 255.f
+        400.f, 300.f, 0.f,  255.f, 0.f, 0.f,
+        200.f, 550.f, 0.f,  0.f, 0.f, 255.f,
+        600.f, 550.f, 0.f,  0.f, 255.f, 0.f
     };
 
     graph_buffer_data(sizeof(verts), verts);
