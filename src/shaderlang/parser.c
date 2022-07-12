@@ -278,8 +278,6 @@ struct Node *parser_parse_assign(struct Parser *p)
     parser_expect(p, TT_EQUAL);
 
     n->assign_right = parser_parse_expr(p);
-    /* n->assign_right = node_alloc(NODE_VAR); */
-    /* n->assign_right->var_name = strdup(p->curr->value); */
 
     return n;
 }

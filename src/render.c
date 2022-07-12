@@ -114,10 +114,6 @@ void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *
             if (i >= g_w) break;
 
             vec3 pos = { i, y, z };
-            /* shader_add_input_vec(g_shader, "i_pos", pos, 3); */
-            /* shader_add_input_float(g_shader, "i_x", pos[0] / 2.f); */
-            /* shader_add_input_float(g_shader, "i_y", pos[1] / 2.f); */
-
             vec3 bary;
             util_bary_coefficients(positions, pos, bary);
 
@@ -128,10 +124,6 @@ void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *
             // should all have the same length anyways
             for (size_t i = 0; i < va->len; ++i)
             {
-                /* struct Node *oa = verts[0]->outputs[i], */
-                /*             *ob = verts[1]->outputs[i], */
-                /*             *oc = verts[2]->outputs[i]; */
-
                 // a * ba + b * bb + c * bc
                 vec3 aba;
                 node_to_vec(verts[0]->outputs[i]->vardef_value, aba);
@@ -156,14 +148,11 @@ void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *
 
             struct Node *color_node = shader_outvar(g_shader, g_shader->scope_frag, "gr_color");
             struct Node **rgb = color_node->vardef_value->vec_values;
+
             uint32_t hex = 0x00000000 |
                 (int)rgb[0]->float_value << 16 |
                 (int)rgb[1]->float_value << 8 |
                 (int)rgb[2]->float_value;
-
-            /* if (hex != 848384) */
-            /*     printf("here\n"); */
-            /* printf("%d\n", (int)color_node->vardef_value->vec3_value[0]); */
 
             int idx = y * g_w + i;
 
