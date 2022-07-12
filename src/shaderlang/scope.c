@@ -16,6 +16,7 @@ struct Scope *scope_alloc()
 
 void scope_free(struct Scope *s)
 {
+    scope_clear(s);
     free(s->layers);
     free(s);
 }

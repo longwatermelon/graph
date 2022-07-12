@@ -121,6 +121,7 @@ void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *
             vec3 bary;
             util_bary_coefficients(positions, pos, bary);
 
+            visitor_bind_scope(g_shader->scope_frag);
             shader_clear_inputs(g_shader);
 
             // Arbitrarily chose va for iterator condition since they

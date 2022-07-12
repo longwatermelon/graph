@@ -19,7 +19,10 @@ struct Parser *parser_alloc(const char *path)
 
 void parser_free(struct Parser *p)
 {
+    token_free(p->prev);
+    token_free(p->curr);
     lexer_free(p->lexer);
+    free(p);
 }
 
 

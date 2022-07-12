@@ -110,7 +110,8 @@ void shader_run_vert(struct Shader *s, SDL_Renderer *rend)
 
 void shader_run_frag(struct Shader *s)
 {
-    // Fragment shader
+    // Inputs are already refreshed, no need to clear
+
     visitor_bind_scope(s->scope_frag);
     scope_clear(s->scope_frag);
     visitor_visit(s->root_frag);
