@@ -17,6 +17,9 @@ struct VertFragInfo *vfi_alloc(struct Shader *s)
 
 void vfi_free(struct VertFragInfo *vfi)
 {
+    for (size_t i = 0; i < vfi->len; ++i)
+        node_free(vfi->outputs[i]);
+
     free(vfi->outputs);
     free(vfi);
 }
