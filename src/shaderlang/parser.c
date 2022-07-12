@@ -152,6 +152,13 @@ struct Node *parser_parse_var(struct Parser *p)
     struct Node *n = node_alloc(NODE_VAR);
     n->var_name = strdup(id);
 
+    if (p->curr->type == TT_PERIOD)
+    {
+        parser_expect(p, TT_PERIOD);
+        n->var_memb_access = strdup(p->curr->value);
+        parser_expect(p, TT_ID);
+    }
+
     return n;
 }
 

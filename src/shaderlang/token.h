@@ -14,6 +14,7 @@ typedef enum
     TT_COMMA,
     TT_FLOAT,
     TT_BINOP,
+    TT_PERIOD,
     TT_EOF
 } TokenType;
 

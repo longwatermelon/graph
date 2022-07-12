@@ -16,6 +16,7 @@ struct Node *node_alloc(NodeType type)
     n->vardef_layout_loc = -1;
 
     n->var_name = 0;
+    n->var_memb_access = 0;
 
     n->call_name = 0;
     n->call_args = 0;
@@ -69,6 +70,7 @@ void node_free(struct Node *n)
     free(n->call_name);
     free(n->var_name);
     free(n->vardef_name);
+    free(n->var_memb_access);
 
     if (n->vardef_value) node_free(n->vardef_value);
     if (n->assign_left) node_free(n->assign_left);
@@ -141,6 +143,9 @@ struct Node *node_copy(struct Node *src)
     case NODE_VAR:
     {
         n->var_name = strdup(src->var_name);
+
+        if (src->var_memb_access)
+            n->var_memb_access = strdup(src->var_memb_access);
     } break;
     case NODE_VARDEF:
     {

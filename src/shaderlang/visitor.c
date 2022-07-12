@@ -50,6 +50,17 @@ struct Node *visitor_visit_vardef(struct Node *n)
 struct Node *visitor_visit_var(struct Node *n)
 {
     struct Node *def = scope_find_vardef(g_scope, n->var_name, true);
+
+    if (n->var_memb_access)
+    {
+        switch (n->var_memb_access[0])
+        {
+        case 'x': return visitor_visit(def->vardef_value->vec_values[0]);
+        case 'y': return visitor_visit(def->vardef_value->vec_values[1]);
+        case 'z': return visitor_visit(def->vardef_value->vec_values[2]);
+        }
+    }
+
     return visitor_visit(def->vardef_value);
 }
 

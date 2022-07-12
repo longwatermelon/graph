@@ -47,6 +47,7 @@ struct Node
 
     // var
     char *var_name;
+    char *var_memb_access; // Only allowing one layer of member access
 
     // func call
     char *call_name;
