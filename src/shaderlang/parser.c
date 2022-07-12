@@ -166,29 +166,26 @@ struct Node *parser_parse_vardef(struct Parser *p)
     char *name = strdup(p->curr->value);
     parser_expect(p, TT_ID);
 
+    if (p->curr->type == TT_LPAREN)
+        return parser_parse_fdef(p, type, name);
+
+    struct Node *n = node_alloc(NODE_VARDEF);
+
     if (p->curr->type == TT_EQUAL)
     {
         parser_expect(p, TT_EQUAL);
 
         struct Node *value = parser_parse_expr(p);
-        struct Node *n = node_alloc(NODE_VARDEF);
-
         n->vardef_name = name;
         n->vardef_type = type;
 
         n->vardef_value = value;
-
-        return n;
-    }
-    else if (p->curr->type == TT_LPAREN)
-    {
-        return parser_parse_fdef(p, type, name);
     }
     else
     {
-        struct Node *n = node_alloc(NODE_VARDEF);
         n->vardef_name = name;
         n->vardef_type = type;
+
         // Default value allocation
         n->vardef_value = node_alloc(n->vardef_type);
 
@@ -200,9 +197,9 @@ struct Node *parser_parse_vardef(struct Parser *p)
             for (size_t i = 0; i < vlen; ++i)
                 n->vardef_value->vec_values[i] = node_alloc(NODE_FLOAT);
         }
-
-        return n;
     }
+
+    return n;
 }
 
 
@@ -296,10 +293,13 @@ struct Node *parser_parse_constructor(struct Parser *p)
     struct Node *n = node_alloc(NODE_CONSTRUCTOR);
     n->construct_type = type;
 
+    struct Node **values = 0;
+    size_t nvalues = 0;
+
     while (p->curr->type != TT_RPAREN)
     {
-        n->construct_values = realloc(n->construct_values, sizeof(struct Node*) * ++n->construct_nvalues);
-        n->construct_values[n->construct_nvalues - 1] = parser_parse_expr(p);
+        values = realloc(values, sizeof(struct Node*) * ++nvalues);
+        values[nvalues - 1] = parser_parse_expr(p);
 
         if (p->curr->type != TT_RPAREN)
             parser_expect(p, TT_COMMA);
@@ -312,30 +312,31 @@ struct Node *parser_parse_constructor(struct Parser *p)
     case NODE_FLOAT:
     case NODE_INT:
     {
-        n->construct_out = node_copy(n->construct_values[0]);
+        n->construct_out = values[0];
     } break;
     case NODE_VEC:
     {
-        if (expect_len != n->construct_nvalues)
+        if (expect_len != nvalues)
         {
             fprintf(stderr, "Parser error: Constructor of type '%s' does not take %zu args - "
                     "%zu were expected.\n",
-                    name, n->construct_nvalues, expect_len);
+                    name, nvalues, expect_len);
             exit(EXIT_FAILURE);
         }
 
         n->construct_out = node_alloc(NODE_VEC);
-        n->construct_out->vec_len = n->construct_nvalues;
+        n->construct_out->vec_len = nvalues;
         n->construct_out->vec_values = malloc(sizeof(struct Node*) * n->construct_out->vec_len);
 
         for (size_t i = 0; i < n->construct_out->vec_len; ++i)
-            n->construct_out->vec_values[i] = node_copy(n->construct_values[i]);
+            n->construct_out->vec_values[i] = values[i];
     } break;
     default:
         fprintf(stderr, "[parser_parse_constructor] Error: %d is not a data type.\n", type);
         exit(EXIT_FAILURE);
     }
 
+    free(values);
     free(name);
     return n;
 }

@@ -63,8 +63,6 @@ struct Node
 
     // constructor
     NodeType construct_type;
-    struct Node **construct_values;
-    size_t construct_nvalues;
     struct Node *construct_out;
 
     // int

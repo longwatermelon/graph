@@ -34,8 +34,6 @@ struct Node *node_alloc(NodeType type)
     n->assign_right = 0;
 
     n->construct_type = -1;
-    n->construct_nvalues = 0;
-    n->construct_values = 0;
     n->construct_out = 0;
 
     n->int_value = 0;
@@ -91,14 +89,6 @@ void node_free(struct Node *n)
             node_free(n->comp_value[i]);
 
         free(n->comp_value);
-    }
-
-    if (n->construct_values)
-    {
-        for (size_t i = 0; i < n->construct_nvalues; ++i)
-            node_free(n->construct_values[i]);
-
-        free(n->construct_values);
     }
 
     if (n->vec_values)
@@ -187,11 +177,6 @@ struct Node *node_copy(struct Node *src)
     {
         n->construct_type = src->construct_type;
         n->construct_out = node_copy(src->construct_out);
-        n->construct_nvalues = src->construct_nvalues;
-        n->construct_values = malloc(sizeof(struct Node*) * n->construct_nvalues);
-
-        for (size_t i = 0; i < n->construct_nvalues; ++i)
-            n->construct_values[i] = node_copy(src->construct_values[i]);
     } break;
     case NODE_FLOAT:
     {
