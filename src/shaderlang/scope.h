@@ -28,7 +28,8 @@ void scope_pop_layer(struct Scope *s);
 // error: throw error if not found
 struct Node *scope_find_vardef(struct Scope *s, const char *name, bool error);
 // Out n
-struct Node **scope_get_vardef_type(struct Scope *s, int type, size_t *n);
+// copy: Copy vardefs if true else return original node
+struct Node **scope_get_vardef_type(struct Scope *s, int type, bool copy, size_t *n);
 struct Node *scope_find_fdef(struct Scope *s, const char *name, bool error);
 
 void scope_add_vardef(struct Scope *s, struct Node *n);

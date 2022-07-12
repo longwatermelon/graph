@@ -26,7 +26,7 @@ void graph_atl_add(int count)
 {
     int offset = 0;
     for (size_t i = 0; i < g_atl->len; ++i)
-        offset += g_atl->layout[i].offset;
+        offset += g_atl->layout[i].count;
 
     g_atl->layout = realloc(g_atl->layout, sizeof(struct AttribLayoutElement) * ++g_atl->len);
     g_atl->layout[g_atl->len - 1] = (struct AttribLayoutElement){ offset, count };

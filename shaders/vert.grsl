@@ -1,8 +1,12 @@
 layout 0 vec3 i_pos;
+layout 1 vec3 i_color;
+
+out vec3 f_color;
 out vec3 gr_pos;
 
 void main()
 {
     gr_pos = i_pos;
+    f_color = i_color;
 }
 

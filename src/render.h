@@ -21,7 +21,7 @@ void graph_draw(SDL_Renderer *rend);
 void graph_use_shader(struct Shader *s);
 
 void graph_render_draw_tri(SDL_Renderer *rend, struct VertFragInfo *points[3]);
-void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *l2);
+void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *l2, struct VertFragInfo *verts[3]);
 
 #endif
 

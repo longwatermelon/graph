@@ -1,6 +1,7 @@
 #include "render.h"
 #include "buffer.h"
 #include "shader.h"
+#include "util.h"
 
 #define swapv(v1, v2, a, b) { \
     struct VertFragInfo *tmp = v1; \
@@ -75,16 +76,21 @@ void graph_render_draw_tri(SDL_Renderer *rend, struct VertFragInfo *points[3])
     RTI r_ab = { a[0], (b[1] - a[1]) / (b[0] - a[0]), a[2], (b[2] - a[2]) / (b[1] - a[1]) };
     RTI r_bc = { b[0], (c[1] - b[1]) / (c[0] - b[0]), b[2], (c[2] - b[2]) / (c[1] - b[1]) };
 
-    fill_edges(points[0], points[1], &r_ac, &r_ab);
-    fill_edges(points[1], points[2], &r_ac, &r_bc);
+    fill_edges(points[0], points[1], &r_ac, &r_ab, points);
+    fill_edges(points[1], points[2], &r_ac, &r_bc, points);
 }
 
 
-void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *l2)
+void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *l2, struct VertFragInfo *verts[3])
 {
     vec3 a, b;
     glm_vec3_copy(va->pos, a);
     glm_vec3_copy(vb->pos, b);
+
+    vec3 positions[3];
+    glm_vec3_copy(verts[0]->pos, positions[0]);
+    glm_vec3_copy(verts[1]->pos, positions[1]);
+    glm_vec3_copy(verts[2]->pos, positions[2]);
 
     for (int y = a[1]; y < b[1]; ++y)
     {
@@ -107,14 +113,55 @@ void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *
 
             if (i >= g_w) break;
 
-            /* vec3 pos = { i, y, z }; */
+            vec3 pos = { i, y, z };
             /* shader_add_input_vec(g_shader, "i_pos", pos, 3); */
             /* shader_add_input_float(g_shader, "i_x", pos[0] / 2.f); */
             /* shader_add_input_float(g_shader, "i_y", pos[1] / 2.f); */
+
+            vec3 bary;
+            util_bary_coefficients(positions, pos, bary);
+
+            shader_clear_inputs(g_shader);
+
+            // Arbitrarily chose va for iterator condition since they
+            // should all have the same length anyways
+            for (size_t i = 0; i < va->len; ++i)
+            {
+                /* struct Node *oa = verts[0]->outputs[i], */
+                /*             *ob = verts[1]->outputs[i], */
+                /*             *oc = verts[2]->outputs[i]; */
+
+                // a * ba + b * bb + c * bc
+                vec3 aba;
+                node_to_vec(verts[0]->outputs[i]->vardef_value, aba);
+                glm_vec3_scale(aba, bary[0], aba);
+
+                vec3 bbb;
+                node_to_vec(verts[1]->outputs[i]->vardef_value, bbb);
+                glm_vec3_scale(bbb, bary[1], bbb);
+
+                vec3 cbc;
+                node_to_vec(verts[2]->outputs[i]->vardef_value, cbc);
+                glm_vec3_scale(cbc, bary[2], cbc);
+
+                vec3 v;
+                glm_vec3_add(aba, bbb, v);
+                glm_vec3_add(v, cbc, v);
+
+                shader_add_input_vec(g_shader, va->outputs[i]->vardef_name, v, 3);
+            }
+
             shader_run_frag(g_shader);
 
             struct Node *color_node = shader_outvar(g_shader, g_shader->scope_frag, "gr_color");
-            uint32_t hex = 0x000000 | (int)color_node->vardef_value->vec_values[0]->float_value << 16 | (int)color_node->vardef_value->vec_values[1]->float_value << 8 | (int)color_node->vardef_value->vec_values[2]->float_value;
+            struct Node **rgb = color_node->vardef_value->vec_values;
+            uint32_t hex = 0x00000000 |
+                (int)rgb[0]->float_value << 16 |
+                (int)rgb[1]->float_value << 8 |
+                (int)rgb[2]->float_value;
+
+            /* if (hex != 848384) */
+            /*     printf("here\n"); */
             /* printf("%d\n", (int)color_node->vardef_value->vec3_value[0]); */
 
             int idx = y * g_w + i;
