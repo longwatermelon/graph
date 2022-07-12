@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 
-struct Token *token_alloc(int type, char *value)
+struct Token *token_alloc(TokenType type, char *value)
 {
     struct Token *t = malloc(sizeof(struct Token));
     t->type = type;

@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <cglm/cglm.h>
 
-enum
+typedef enum
 {
     NODE_VARDEF,
     NODE_VAR,
@@ -18,15 +18,15 @@ enum
     NODE_PARAM,
     NODE_ASSIGN,
     NODE_CONSTRUCTOR
-};
+} NodeType;
 
-enum
+typedef enum
 {
     VAR_REG,
     VAR_IN,
     VAR_OUT,
     VAR_LAYOUT
-};
+} VarModifier;
 
 struct Node
 {
@@ -35,8 +35,8 @@ struct Node
     // vardef
     char *vardef_name;
     struct Node *vardef_value;
-    int vardef_modifier;
-    int vardef_type;
+    VarModifier vardef_modifier;
+    NodeType vardef_type;
     int vardef_layout_loc;
 
     // var
@@ -52,17 +52,17 @@ struct Node
     struct Node **fdef_params;
     size_t fdef_nparams;
     struct Node *fdef_body;
-    int fdef_type;
+    NodeType fdef_type;
 
     // param
-    int param_type;
+    NodeType param_type;
     char *param_name;
 
     // assign
     struct Node *assign_left, *assign_right;
 
     // constructor
-    int construct_type;
+    NodeType construct_type;
     struct Node **construct_values;
     size_t construct_nvalues;
     struct Node *construct_out;
@@ -82,7 +82,7 @@ struct Node
     float float_value;
 };
 
-struct Node *node_alloc(int type);
+struct Node *node_alloc(NodeType type);
 void node_free(struct Node *n);
 
 struct Node *node_copy(struct Node *src);

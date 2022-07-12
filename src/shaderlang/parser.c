@@ -26,9 +26,9 @@ void parser_free(struct Parser *p)
 }
 
 
-void parser_expect(struct Parser *p, int ttype)
+void parser_expect(struct Parser *p, TokenType type)
 {
-    if (p->curr->type == ttype)
+    if (p->curr->type == type)
     {
         if (p->prev) token_free(p->prev);
         p->prev = p->curr;
@@ -37,7 +37,7 @@ void parser_expect(struct Parser *p, int ttype)
     else
     {
         fprintf(stderr, "Parser error: Unexpected token '%s' of type %d; expected token of type %d.\n",
-                p->curr->value, p->curr->type, ttype);
+                p->curr->value, p->curr->type, type);
         exit(EXIT_FAILURE);
     }
 }
@@ -152,7 +152,7 @@ struct Node *parser_parse_var(struct Parser *p)
 
 struct Node *parser_parse_vardef(struct Parser *p)
 {
-    int type = node_str2nt(p->curr->value);
+    NodeType type = node_str2nt(p->curr->value);
 
     int vlen;
     if (type == NODE_VEC)
@@ -230,7 +230,7 @@ struct Node *parser_parse_call(struct Parser *p)
 }
 
 
-struct Node *parser_parse_fdef(struct Parser *p, int type, char *name)
+struct Node *parser_parse_fdef(struct Parser *p, NodeType type, char *name)
 {
     struct Node *n = node_alloc(NODE_FUNC_DEF);
     n->fdef_type = type;
@@ -286,7 +286,7 @@ struct Node *parser_parse_assign(struct Parser *p)
 struct Node *parser_parse_constructor(struct Parser *p)
 {
     // On lparen
-    int type = node_str2nt(p->prev->value);
+    NodeType type = node_str2nt(p->prev->value);
     // For vec
     size_t expect_len = p->prev->value[3] - '0';
     char *name = strdup(p->prev->value);
@@ -331,6 +331,9 @@ struct Node *parser_parse_constructor(struct Parser *p)
         for (size_t i = 0; i < n->construct_out->vec_len; ++i)
             n->construct_out->vec_values[i] = node_copy(n->construct_values[i]);
     } break;
+    default:
+        fprintf(stderr, "[parser_parse_constructor] Error: %d is not a data type.\n", type);
+        exit(EXIT_FAILURE);
     }
 
     free(name);

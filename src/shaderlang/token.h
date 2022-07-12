@@ -1,7 +1,7 @@
 #ifndef SHADER_TOKEN_H
 #define SHADER_TOKEN_H
 
-enum
+typedef enum
 {
     TT_ID,
     TT_INT,
@@ -14,7 +14,7 @@ enum
     TT_COMMA,
     TT_FLOAT,
     TT_EOF
-};
+} TokenType;
 
 struct Token
 {
@@ -23,7 +23,7 @@ struct Token
 };
 
 // Value must be heap allocated, will be freed in token_free
-struct Token *token_alloc(int type, char *value);
+struct Token *token_alloc(TokenType type, char *value);
 void token_free(struct Token *t);
 
 #endif

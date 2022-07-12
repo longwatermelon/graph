@@ -4,7 +4,7 @@
 #include <string.h>
 
 
-struct Node *node_alloc(int type)
+struct Node *node_alloc(NodeType type)
 {
     struct Node *n = malloc(sizeof(struct Node));
     n->type = type;
