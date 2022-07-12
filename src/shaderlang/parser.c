@@ -12,6 +12,7 @@ struct Parser *parser_alloc(const char *path)
     p->lexer = lexer_alloc(util_read_file(path));
     p->curr = lexer_next_token(p->lexer);
     p->prev = 0;
+    p->prev_node = 0;
 
     return p;
 }
@@ -67,14 +68,30 @@ struct Node *parser_parse(struct Parser *p)
 
 struct Node *parser_parse_expr(struct Parser *p)
 {
+    bool found = true;
+
     switch (p->curr->type)
     {
-    case TT_INT: return parser_parse_int(p);
-    case TT_FLOAT: return parser_parse_float(p);
-    case TT_ID: return parser_parse_id(p);
+    case TT_INT: p->prev_node = parser_parse_int(p); break;
+    case TT_FLOAT: p->prev_node = parser_parse_float(p); break;
+    case TT_ID: p->prev_node = parser_parse_id(p); break;
+    default: found = false;
     }
 
-    return 0;
+    if (found)
+    {
+        if (p->curr->type == TT_BINOP)
+        {
+            struct Node *n = parser_parse_binop(p, p->prev_node);
+            p->prev_node = n;
+        }
+    }
+    else
+    {
+        p->prev_node = 0;
+    }
+
+    return p->prev_node;
 }
 
 
@@ -83,9 +100,6 @@ struct Node *parser_parse_int(struct Parser *p)
     struct Node *n = node_alloc(NODE_INT);
     n->int_value = atoi(p->curr->value);
     parser_expect(p, TT_INT);
-
-    if (p->curr->type == TT_BINOP)
-        return parser_parse_binop(p, n);
 
     return n;
 }
@@ -96,9 +110,6 @@ struct Node *parser_parse_float(struct Parser *p)
     struct Node *n = node_alloc(NODE_FLOAT);
     n->float_value = atof(p->curr->value);
     parser_expect(p, TT_FLOAT);
-
-    if (p->curr->type == TT_BINOP)
-        return parser_parse_binop(p, n);
 
     return n;
 }

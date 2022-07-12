@@ -9,6 +9,8 @@ struct Parser
 {
     struct Token *curr, *prev;
     struct Lexer *lexer;
+
+    struct Node *prev_node;
 };
 
 struct Parser *parser_alloc(const char *path);
