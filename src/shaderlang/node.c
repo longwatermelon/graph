@@ -50,6 +50,7 @@ struct Node *node_alloc(NodeType type)
     n->op = 0;
     n->op_l = 0;
     n->op_r = 0;
+    n->op_priority = false;
 
     if (type == NODE_BINOP)
         n->op_res = node_alloc(0);

@@ -93,6 +93,7 @@ struct Node
     Binop op;
     struct Node *op_l, *op_r;
     struct Node *op_res; // Hack around no heap allocations in visitor
+    bool op_priority;
 };
 
 struct Node *node_alloc(NodeType type);

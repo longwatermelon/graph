@@ -75,6 +75,15 @@ struct Node *parser_parse_expr(struct Parser *p)
     case TT_INT: p->prev_node = parser_parse_int(p); break;
     case TT_FLOAT: p->prev_node = parser_parse_float(p); break;
     case TT_ID: p->prev_node = parser_parse_id(p); break;
+    case TT_LPAREN:
+        parser_expect(p, TT_LPAREN);
+        p->prev_node = parser_parse_expr(p);
+
+        if (p->prev_node->type == NODE_BINOP)
+            p->prev_node->op_priority = true;
+
+        parser_expect(p, TT_RPAREN);
+        break;
     default: found = false;
     }
 
@@ -387,7 +396,7 @@ struct Node *parser_parse_binop(struct Parser *p, struct Node *left)
 
     struct Node *parent = parser_parse_expr(p);
 
-    if (parent->type == NODE_BINOP)
+    if (parent->type == NODE_BINOP && !parent->op_priority)
     {
         struct Node *bot_left = parent;
 
