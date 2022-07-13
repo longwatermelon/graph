@@ -12,23 +12,23 @@ int main(int argc, char **argv)
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
 
-    SDL_Window *w = SDL_CreateWindow("Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 800, SDL_WINDOW_SHOWN);
+    SDL_Window *w = SDL_CreateWindow("Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 400, 400, SDL_WINDOW_SHOWN);
     SDL_Renderer *r = SDL_CreateRenderer(w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    graph_init_renderer(800, 800);
+    graph_init_renderer(400, 400);
 
     bool running = true;
     SDL_Event evt;
 
-    SDL_Texture *scr = SDL_CreateTexture(r, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 800, 800);
+    SDL_Texture *scr = SDL_CreateTexture(r, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 400, 400);
 
     struct Buffer *b = graph_gen_buffer();
     graph_bind_buffer(b);
 
     float verts[] = {
-        400.f, 300.f, 0.f,  255.f, 0.f, 0.f,
-        200.f, 550.f, 0.f,  0.f, 0.f, 255.f,
-        600.f, 550.f, 0.f,  0.f, 255.f, 0.f
+        200.f, 150.f, 0.f,  255.f, 0.f, 0.f,
+        125.f, 275.f, 0.f,  0.f, 0.f, 255.f,
+        275.f, 275.f, 0.f,  0.f, 255.f, 0.f
     };
 
     graph_buffer_data(sizeof(verts), verts);
