@@ -152,13 +152,6 @@ struct Node *parser_parse_id(struct Parser *p)
 
         return n;
     }
-    else if (strcmp(p->curr->value, "iout") == 0)
-    {
-        parser_expect(p, TT_ID);
-        struct Node *n = parser_parse_vardef(p);
-        n->vardef_modifier = VAR_INTERPOUT;
-        return n;
-    }
 
     if (IS_TYPE(p->curr->value))
         return parser_parse_vardef(p);

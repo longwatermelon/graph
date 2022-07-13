@@ -4,8 +4,8 @@ layout 1 vec3 i_color;
 in float i_time;
 out float f_time;
 
-iout vec3 f_color;
-iout vec3 gr_pos;
+out vec3 f_color;
+out vec3 gr_pos;
 
 void main()
 {

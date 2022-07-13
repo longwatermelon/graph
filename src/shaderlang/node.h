@@ -34,8 +34,7 @@ typedef enum
     VAR_REG = 1,
     VAR_IN = 2,
     VAR_OUT = 4,
-    VAR_INTERPOUT = 8,
-    VAR_LAYOUT = 16
+    VAR_LAYOUT = 8
 } VarModifier;
 
 struct Node
