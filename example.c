@@ -1,7 +1,4 @@
 #include "graph.h"
-#include "render.h"
-#include "buffer.h"
-#include "attrib.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>

@@ -2,7 +2,6 @@
 #define LIBGRAPH_RENDER_H
 
 #include "shader.h"
-#include <cglm/cglm.h>
 #include <SDL2/SDL.h>
 
 typedef struct
