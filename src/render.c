@@ -83,23 +83,31 @@ void graph_render_draw_tri(SDL_Renderer *rend, struct VertFragInfo *points[3])
 void interp_vec(struct VertFragInfo *verts[3], vec3 bary, size_t i)
 {
     // a * ba + b * bb + c * bc
-    vec3 aba;
+    struct Node *vec = visitor_visit(verts[0]->outputs[i]->vardef_value);
+    size_t vec_len = vec->vec_len;
+
+    float *aba = malloc(sizeof(float) * vec_len),
+          *bbb = malloc(sizeof(float) * vec_len),
+          *cbc = malloc(sizeof(float) * vec_len);
+
     node_to_vec(verts[0]->outputs[i]->vardef_value, aba);
-    glm_vec3_scale(aba, bary[0], aba);
+    for (size_t j = 0; j < vec_len; ++j) aba[j] *= bary[0];
 
-    vec3 bbb;
     node_to_vec(verts[1]->outputs[i]->vardef_value, bbb);
-    glm_vec3_scale(bbb, bary[1], bbb);
+    for (size_t j = 0; j < vec_len; ++j) bbb[j] *= bary[1];
 
-    vec3 cbc;
     node_to_vec(verts[2]->outputs[i]->vardef_value, cbc);
-    glm_vec3_scale(cbc, bary[2], cbc);
+    for (size_t j = 0; j < vec_len; ++j) cbc[j] *= bary[2];
 
-    vec3 v;
-    glm_vec3_add(aba, bbb, v);
-    glm_vec3_add(v, cbc, v);
+    // Store sum in aba (arbitrarily chosen)
+    for (size_t j = 0; j < vec_len; ++j)
+        aba[j] += bbb[j] + cbc[j];
 
-    shader_add_input_vec(g_shader, verts[0]->outputs[i]->vardef_name, v, 3);
+    shader_add_input_vec(g_shader, verts[0]->outputs[i]->vardef_name, aba, vec_len);
+
+    free(aba);
+    free(bbb);
+    free(cbc);
 }
 
 void interp_float(struct VertFragInfo *verts[3], vec3 bary, size_t i)
