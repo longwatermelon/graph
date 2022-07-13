@@ -113,6 +113,7 @@ struct Token *lexer_next_token(struct Lexer *l)
         case ',': return lexer_advance_with_token(l, token_alloc(TT_COMMA, strdup(",")));
         case '.': return lexer_advance_with_token(l, token_alloc(TT_PERIOD, strdup(".")));
         case '+': return lexer_advance_with_token(l, token_binop_alloc(BT_PLUS, strdup("+")));
+        case '-': return lexer_advance_with_token(l, token_binop_alloc(BT_MINUS, strdup("-")));
         case '\n':
             ++l->line_num;
             lexer_advance(l);

@@ -23,7 +23,8 @@ typedef enum
 
 typedef enum
 {
-    BINOP_ADD
+    BINOP_ADD,
+    BINOP_SUB
 } Binop;
 
 typedef enum

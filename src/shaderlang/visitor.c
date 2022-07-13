@@ -123,6 +123,14 @@ struct Node *visitor_visit_param(struct Node *n)
     return visitor_visit(def->vardef_value);
 }
 
+#define BINOP_EXECUTE(a, b, op, res) { \
+    switch (op) \
+    { \
+    case BINOP_ADD: res = a + b; break; \
+    case BINOP_SUB: res = a - b; break; \
+    default: break; \
+    } \
+}
 
 struct Node *visitor_visit_binop(struct Node *n)
 {
@@ -141,10 +149,10 @@ struct Node *visitor_visit_binop(struct Node *n)
     switch (l->type)
     {
     case NODE_FLOAT:
-        n->op_res->float_value = l->float_value + r->float_value;
+        BINOP_EXECUTE(l->float_value, r->float_value, l->type, n->op_res->float_value);
         break;
     case NODE_INT:
-        n->op_res->int_value = l->int_value + r->int_value;
+        BINOP_EXECUTE(l->int_value, r->int_value, l->type, n->op_res->int_value);
         break;
     default:
         fprintf(stderr, "[visitor_visit_binop] Error: %d is not a data type.\n",

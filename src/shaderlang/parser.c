@@ -373,6 +373,7 @@ struct Node *parser_parse_binop(struct Parser *p, struct Node *left)
     switch (p->curr->value[0])
     {
     case '+': n->op = BINOP_ADD; break;
+    case '-': n->op = BINOP_SUB; break;
     default:
         fprintf(stderr, "[parser_parse_binop] Error: Operator '%c' not defined.\n", p->curr->value[0]);
         exit(EXIT_FAILURE);

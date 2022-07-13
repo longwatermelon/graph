@@ -8,7 +8,7 @@ struct Token *token_alloc(TokenType type, char *value)
     t->type = type;
     t->value = value;
 
-    t->binop = -1;
+    t->binop = 0;
 
     return t;
 }
