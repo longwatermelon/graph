@@ -126,6 +126,8 @@ struct Node *visitor_visit_param(struct Node *n)
 #define BINOP_EXECUTE(a, b, op, res) { \
     if (op == BINOP_ADD) res = a + b; \
     if (op == BINOP_SUB) res = a - b; \
+    if (op == BINOP_MUL) res = a * b; \
+    if (op == BINOP_DIV) res = a / b; \
 }
 
 struct Node *visitor_visit_binop(struct Node *n)

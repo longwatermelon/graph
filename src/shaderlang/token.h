@@ -21,7 +21,9 @@ typedef enum
 typedef enum
 {
     BT_PLUS,
-    BT_MINUS
+    BT_MINUS,
+    BT_MUL,
+    BT_DIV
 } BinopToken;
 
 struct Token
