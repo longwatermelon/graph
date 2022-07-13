@@ -1,7 +1,8 @@
 out vec3 gr_color;
 in vec3 f_color;
+in float f_time;
 
 void main()
 {
-    gr_color = vec3(f_color.x, f_color.y, f_color.z);
+    gr_color = vec3(f_color.x / f_time * 100., f_color.y / f_time * 100., f_color.z / f_time * 100.);
 }

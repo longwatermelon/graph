@@ -53,6 +53,8 @@ int main(int argc, char **argv)
 
         SDL_RenderClear(r);
 
+        /* printf("%f\n", (float)SDL_GetTicks() / 100.f); */
+        graph_shader_input(shader, float, "i_time", (float)SDL_GetTicks() / 100.f);
         graph_draw(r);
         graph_render_result(scr);
 

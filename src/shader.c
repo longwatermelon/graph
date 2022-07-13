@@ -7,7 +7,7 @@
 struct VertFragInfo *vfi_alloc(struct Shader *s)
 {
     struct VertFragInfo *vfi = malloc(sizeof(struct VertFragInfo));
-    vfi->outputs = scope_get_vardef_type(s->scope_vert, VAR_OUT, true, &vfi->len);
+    vfi->outputs = scope_get_vardef_type(s->scope_vert, VAR_OUT | VAR_INTERPOUT, true, &vfi->len);
 
     struct Node *pos_node = shader_outvar(s, s->scope_vert, "gr_pos");
     node_to_vec(pos_node->vardef_value, vfi->pos);
@@ -252,7 +252,7 @@ struct Node *shader_outvar(struct Shader *s, struct Scope *scope, const char *na
     {
         struct Node *def = layer->vardefs[i];
 
-        if (strcmp(def->vardef_name, name) == 0 && def->vardef_modifier == VAR_OUT)
+        if (strcmp(def->vardef_name, name) == 0 && (def->vardef_modifier == VAR_OUT || def->vardef_modifier == VAR_INTERPOUT))
             return layer->vardefs[i];
     }
 

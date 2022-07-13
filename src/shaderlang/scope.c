@@ -61,7 +61,7 @@ struct Node *scope_find_vardef(struct Scope *s, const char *name, bool error)
 }
 
 
-struct Node **scope_get_vardef_type(struct Scope *s, int type, bool copy, size_t *n)
+struct Node **scope_get_vardef_type(struct Scope *s, VarModifier type, bool copy, size_t *n)
 {
     struct Node **defs = 0;
     *n = 0;
@@ -74,7 +74,7 @@ struct Node **scope_get_vardef_type(struct Scope *s, int type, bool copy, size_t
         {
             struct Node *def = layer->vardefs[j];
 
-            if (def->vardef_modifier == type)
+            if (def->vardef_modifier & type)
             {
                 defs = realloc(defs, sizeof(struct Node*) * ++*n);
                 defs[*n - 1] = copy ? node_copy(def) : def;

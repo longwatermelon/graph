@@ -124,24 +124,51 @@ void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *
             // should all have the same length anyways
             for (size_t i = 0; i < va->len; ++i)
             {
-                // a * ba + b * bb + c * bc
-                vec3 aba;
-                node_to_vec(verts[0]->outputs[i]->vardef_value, aba);
-                glm_vec3_scale(aba, bary[0], aba);
+                if (va->outputs[i]->vardef_modifier == VAR_INTERPOUT)
+                {
+                    // a * ba + b * bb + c * bc
+                    vec3 aba;
+                    node_to_vec(verts[0]->outputs[i]->vardef_value, aba);
+                    glm_vec3_scale(aba, bary[0], aba);
 
-                vec3 bbb;
-                node_to_vec(verts[1]->outputs[i]->vardef_value, bbb);
-                glm_vec3_scale(bbb, bary[1], bbb);
+                    vec3 bbb;
+                    node_to_vec(verts[1]->outputs[i]->vardef_value, bbb);
+                    glm_vec3_scale(bbb, bary[1], bbb);
 
-                vec3 cbc;
-                node_to_vec(verts[2]->outputs[i]->vardef_value, cbc);
-                glm_vec3_scale(cbc, bary[2], cbc);
+                    vec3 cbc;
+                    node_to_vec(verts[2]->outputs[i]->vardef_value, cbc);
+                    glm_vec3_scale(cbc, bary[2], cbc);
 
-                vec3 v;
-                glm_vec3_add(aba, bbb, v);
-                glm_vec3_add(v, cbc, v);
+                    vec3 v;
+                    glm_vec3_add(aba, bbb, v);
+                    glm_vec3_add(v, cbc, v);
 
-                shader_add_input_vec(g_shader, va->outputs[i]->vardef_name, v, 3);
+                    shader_add_input_vec(g_shader, va->outputs[i]->vardef_name, v, 3);
+                }
+                else
+                {
+                    // Use va because all points should give the same output (not interpolated)
+                    switch (va->outputs[i]->vardef_type)
+                    {
+                    case NODE_INT:
+                        shader_add_input_int(g_shader, va->outputs[i]->vardef_name,
+                            visitor_visit(va->outputs[i]->vardef_value)->int_value);
+                        break;
+                    case NODE_FLOAT:
+                        shader_add_input_float(g_shader, va->outputs[i]->vardef_name,
+                            visitor_visit(va->outputs[i]->vardef_value)->float_value);
+                        break;
+                    case NODE_VEC:
+                    {
+                        struct Node *vec = visitor_visit(va->outputs[i]->vardef_value);
+                        float *v = malloc(sizeof(float) * vec->vec_len);
+                        node_to_vec(vec, v);
+                        shader_add_input_vec(g_shader, va->outputs[i]->vardef_name, v, vec->vec_len);
+                        free(v);
+                    } break;
+                    default: break;
+                    }
+                }
             }
 
             shader_run_frag(g_shader);

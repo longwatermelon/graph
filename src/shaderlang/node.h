@@ -31,10 +31,11 @@ typedef enum
 
 typedef enum
 {
-    VAR_REG,
-    VAR_IN,
-    VAR_OUT,
-    VAR_LAYOUT
+    VAR_REG = 1,
+    VAR_IN = 2,
+    VAR_OUT = 4,
+    VAR_INTERPOUT = 8,
+    VAR_LAYOUT = 16
 } VarModifier;
 
 struct Node
