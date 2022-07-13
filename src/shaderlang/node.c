@@ -12,7 +12,7 @@ struct Node *node_alloc(NodeType type)
     n->vardef_name = 0;
     n->vardef_value = 0;
     n->vardef_modifier = VAR_REG;
-    n->vardef_type = -1;
+    n->vardef_type = 0;
     n->vardef_layout_loc = -1;
 
     n->var_name = 0;
@@ -26,15 +26,15 @@ struct Node *node_alloc(NodeType type)
     n->fdef_body = 0;
     n->fdef_params = 0;
     n->fdef_nparams = 0;
-    n->fdef_type = -1;
+    n->fdef_type = 0;
 
-    n->param_type = -1;
+    n->param_type = 0;
     n->param_name = 0;
 
     n->assign_left = 0;
     n->assign_right = 0;
 
-    n->construct_type = -1;
+    n->construct_type = 0;
     n->construct_out = 0;
 
     n->int_value = 0;
@@ -47,12 +47,12 @@ struct Node *node_alloc(NodeType type)
 
     n->float_value = 0.f;
 
-    n->op = -1;
+    n->op = 0;
     n->op_l = 0;
     n->op_r = 0;
 
     if (type == NODE_BINOP)
-        n->op_res = node_alloc(-1);
+        n->op_res = node_alloc(0);
     else
         n->op_res = 0;
 

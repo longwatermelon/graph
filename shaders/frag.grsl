@@ -3,5 +3,5 @@ in vec3 f_color;
 
 void main()
 {
-    gr_color = vec3(f_color.x, f_color.y, f_color.y);
+    gr_color = vec3(100. + 2. + 3., f_color.y, f_color.x);
 }

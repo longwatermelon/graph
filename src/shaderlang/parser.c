@@ -381,8 +381,25 @@ struct Node *parser_parse_binop(struct Parser *p, struct Node *left)
     parser_expect(p, TT_BINOP);
 
     n->op_l = left;
-    n->op_r = parser_parse_expr(p);
 
-    return n;
+    struct Node *parent = parser_parse_expr(p);
+
+    if (parent->type == NODE_BINOP)
+    {
+        struct Node *bot_left = parent;
+
+        while (bot_left->op_l->type == NODE_BINOP)
+            bot_left = bot_left->op_l;
+
+        n->op_r = bot_left->op_l;
+        bot_left->op_l = n;
+
+        return parent;
+    }
+    else
+    {
+        n->op_r = parent;
+        return n;
+    }
 }
 
