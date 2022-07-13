@@ -4,5 +4,5 @@ in float f_time;
 
 void main()
 {
-    gr_color = vec3(f_color.x / f_time * 300., f_color.y / f_time * 300., f_color.z / f_time * 300.);
+    gr_color = vec3(f_color.x / f_time * 200., f_color.y / f_time * 200., f_color.z / f_time * 200.);
 }

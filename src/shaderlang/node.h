@@ -83,7 +83,8 @@ struct Node
     size_t comp_nvalues;
 
     // vec3
-    struct Node **vec_values;
+    struct Node **vec_tree_values;
+    struct Node **vec_runtime_values;
     size_t vec_len;
 
     // float

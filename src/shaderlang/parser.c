@@ -225,10 +225,10 @@ struct Node *parser_parse_vardef(struct Parser *p)
         if (type == NODE_VEC)
         {
             n->vardef_value->vec_len = vlen;
-            n->vardef_value->vec_values = malloc(sizeof(struct Node*) * vlen);
+            n->vardef_value->vec_tree_values = malloc(sizeof(struct Node*) * vlen);
 
             for (size_t i = 0; i < vlen; ++i)
-                n->vardef_value->vec_values[i] = node_alloc(NODE_FLOAT);
+                n->vardef_value->vec_tree_values[i] = node_alloc(NODE_FLOAT);
         }
     }
 
@@ -359,10 +359,10 @@ struct Node *parser_parse_constructor(struct Parser *p)
 
         n->construct_out = node_alloc(NODE_VEC);
         n->construct_out->vec_len = nvalues;
-        n->construct_out->vec_values = malloc(sizeof(struct Node*) * n->construct_out->vec_len);
+        n->construct_out->vec_tree_values = malloc(sizeof(struct Node*) * n->construct_out->vec_len);
 
         for (size_t i = 0; i < n->construct_out->vec_len; ++i)
-            n->construct_out->vec_values[i] = values[i];
+            n->construct_out->vec_tree_values[i] = values[i];
     } break;
     default:
         fprintf(stderr, "[parser_parse_constructor] Error: %d is not a data type.\n", type);

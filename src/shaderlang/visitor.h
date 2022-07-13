@@ -24,5 +24,7 @@ struct Node **visitor_output_variables(size_t *n);
 void visitor_bind_scope(struct Scope *s);
 struct Scope *visitor_scope_bound();
 
+void visitor_ignore_fdefs(bool ignore);
+
 #endif
 

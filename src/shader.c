@@ -42,11 +42,13 @@ struct Shader *shader_alloc(const char *vert, const char *frag)
     s->root_frag = parser_parse(parser_frag);
     parser_free(parser_frag);
 
+    visitor_ignore_fdefs(false);
     visitor_bind_scope(s->scope_vert);
     visitor_visit(s->root_vert);
 
     visitor_bind_scope(s->scope_frag);
     visitor_visit(s->root_frag);
+    visitor_ignore_fdefs(true);
 
     s->main_call = node_alloc(NODE_FUNC_CALL);
     s->main_call->call_name = strdup("main");
@@ -85,7 +87,7 @@ void shader_run_vert(struct Shader *s, SDL_Renderer *rend)
         {
             // Vertex shader
             visitor_bind_scope(s->scope_vert);
-            scope_clear(s->scope_vert);
+            scope_clear_vardefs(s->scope_vert);
             visitor_visit(s->root_vert);
 
             shader_insert_layout_vars(s, start);
@@ -113,7 +115,7 @@ void shader_run_frag(struct Shader *s)
     // Inputs are already refreshed, no need to clear
 
     visitor_bind_scope(s->scope_frag);
-    scope_clear(s->scope_frag);
+    scope_clear_vardefs(s->scope_frag);
     visitor_visit(s->root_frag);
 
     shader_insert_runtime_inputs(s);
@@ -177,8 +179,8 @@ void shader_insert_layout_vars(struct Shader *s, float *start)
                 struct Node *n = node_alloc(NODE_FLOAT);
                 n->float_value = begin[j];
 
-                node_free(def->vardef_value->vec_values[j]);
-                def->vardef_value->vec_values[j] = n;
+                node_free(def->vardef_value->vec_tree_values[j]);
+                def->vardef_value->vec_tree_values[j] = n;
             }
         }
     }
@@ -199,13 +201,13 @@ void shader_add_input_vec(struct Shader *s, const char *name, float *v, size_t l
     n->vardef_value = node_alloc(NODE_VEC);
 
     n->vardef_value->vec_len = len;
-    n->vardef_value->vec_values = malloc(sizeof(struct Node*) * len);
+    n->vardef_value->vec_tree_values = malloc(sizeof(struct Node*) * len);
 
     for (size_t i = 0; i < len; ++i)
     {
         struct Node *num = node_alloc(NODE_FLOAT);
         num->float_value = v[i];
-        n->vardef_value->vec_values[i] = num;
+        n->vardef_value->vec_tree_values[i] = num;
     }
 }
 

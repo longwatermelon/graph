@@ -42,8 +42,9 @@ struct Node *node_alloc(NodeType type)
     n->comp_nvalues = 0;
     n->comp_value = 0;
 
-    n->vec_values = 0;
+    n->vec_tree_values = 0;
     n->vec_len = 0;
+    n->vec_runtime_values = 0;
 
     n->float_value = 0.f;
 
@@ -106,12 +107,20 @@ void node_free(struct Node *n)
         free(n->comp_value);
     }
 
-    if (n->vec_values)
+    if (n->vec_tree_values)
     {
         for (size_t i = 0; i < n->vec_len; ++i)
-            node_free(n->vec_values[i]);
+            node_free(n->vec_tree_values[i]);
 
-        free(n->vec_values);
+        free(n->vec_tree_values);
+    }
+
+    if (n->vec_runtime_values)
+    {
+        for (size_t i = 0; i < n->vec_len; ++i)
+            node_free(n->vec_runtime_values[i]);
+
+        free(n->vec_runtime_values);
     }
 
     free(n);
@@ -127,10 +136,18 @@ struct Node *node_copy(struct Node *src)
     case NODE_VEC:
     {
         n->vec_len = src->vec_len;
-        n->vec_values = malloc(sizeof(struct Node*) * n->vec_len);
+        n->vec_tree_values = malloc(sizeof(struct Node*) * n->vec_len);
+
+        if (src->vec_runtime_values)
+            n->vec_runtime_values = malloc(sizeof(struct Node*) * n->vec_len);
 
         for (size_t i = 0; i < n->vec_len; ++i)
-            n->vec_values[i] = node_copy(src->vec_values[i]);
+        {
+            n->vec_tree_values[i] = node_copy(src->vec_tree_values[i]);
+
+            if (src->vec_runtime_values)
+                n->vec_runtime_values[i] = node_copy(src->vec_runtime_values[i]);
+        }
     } break;
     case NODE_FUNC_CALL:
     {
@@ -228,6 +245,6 @@ int node_str2nt(const char *str)
 void node_to_vec(struct Node *vec, float *out)
 {
     for (size_t i = 0; i < vec->vec_len; ++i)
-        out[i] = visitor_visit(vec->vec_values[i])->float_value;
+        out[i] = visitor_visit(vec->vec_runtime_values[i])->float_value;
 }
 

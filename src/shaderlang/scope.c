@@ -8,6 +8,9 @@ struct Scope *scope_alloc()
     s->layers = 0;
     s->nlayers = 0;
 
+    s->fdefs = 0;
+    s->nfdefs = 0;
+
     scope_push_layer(s);
 
     return s;
@@ -16,7 +19,12 @@ struct Scope *scope_alloc()
 
 void scope_free(struct Scope *s)
 {
-    scope_clear(s);
+    for (size_t i = 0; i < s->nfdefs; ++i)
+        node_free(s->fdefs[i]);
+
+    free(s->fdefs);
+
+    scope_clear_vardefs(s);
     free(s->layers);
     free(s);
 }
@@ -25,7 +33,7 @@ void scope_free(struct Scope *s)
 void scope_push_layer(struct Scope *s)
 {
     s->layers = realloc(s->layers, sizeof(struct ScopeLayer) * ++s->nlayers);
-    s->layers[s->nlayers - 1] = (struct ScopeLayer){ 0, 0, 0, 0 };
+    s->layers[s->nlayers - 1] = (struct ScopeLayer){ 0, 0 };
 
     s->top = &s->layers[s->nlayers - 1];
 }
@@ -88,15 +96,12 @@ struct Node **scope_get_vardef_type(struct Scope *s, VarModifier type, bool copy
 
 struct Node *scope_find_fdef(struct Scope *s, const char *name, bool error)
 {
-    for (size_t i = 0; i < s->nlayers; ++i)
+    for (size_t i = 0; i < s->nfdefs; ++i)
     {
-        for (size_t j = 0; j < s->layers[i].nfdefs; ++j)
-        {
-            struct Node *fdef = s->layers[i].fdefs[j];
+        struct Node *fdef = s->fdefs[i];
 
-            if (strcmp(fdef->fdef_name, name) == 0)
-                return fdef;
-        }
+        if (strcmp(fdef->fdef_name, name) == 0)
+            return fdef;
     }
 
     if (error)
@@ -118,12 +123,12 @@ void scope_add_vardef(struct Scope *s, struct Node *n)
 
 void scope_add_fdef(struct Scope *s, struct Node *n)
 {
-    s->top->fdefs = realloc(s->top->fdefs, sizeof(struct Node*) * ++s->top->nfdefs);
-    s->top->fdefs[s->top->nfdefs - 1] = n;
+    s->fdefs = realloc(s->fdefs, sizeof(struct Node*) * ++s->nfdefs);
+    s->fdefs[s->nfdefs - 1] = n;
 }
 
 
-void scope_clear(struct Scope *s)
+void scope_clear_vardefs(struct Scope *s)
 {
     for (size_t i = 0; i < s->nlayers; ++i)
     {
@@ -133,11 +138,6 @@ void scope_clear(struct Scope *s)
             node_free(layer->vardefs[j]);
 
         free(layer->vardefs);
-
-        for (size_t j = 0; j < layer->nfdefs; ++j)
-            node_free(layer->fdefs[j]);
-
-        free(layer->fdefs);
     }
 
     free(s->layers);

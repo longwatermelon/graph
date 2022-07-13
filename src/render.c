@@ -157,12 +157,12 @@ void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *
 
             // Arbitrarily chose va for iterator condition since they
             // should all have the same length anyways
-            for (size_t i = 0; i < va->len; ++i)
+            for (size_t j = 0; j < va->len; ++j)
             {
-                switch (va->outputs[i]->vardef_type)
+                switch (va->outputs[j]->vardef_type)
                 {
-                case NODE_VEC: interp_vec(verts, bary, i); break;
-                case NODE_FLOAT: interp_float(verts, bary, i); break;
+                case NODE_VEC: interp_vec(verts, bary, j); break;
+                case NODE_FLOAT: interp_float(verts, bary, j); break;
                 default: break;
                 }
             }
@@ -170,7 +170,7 @@ void fill_edges(struct VertFragInfo *va, struct VertFragInfo *vb, RTI *l1, RTI *
             shader_run_frag(g_shader);
 
             struct Node *color_node = shader_outvar(g_shader, g_shader->scope_frag, "gr_color");
-            struct Node **rgb = color_node->vardef_value->vec_values;
+            struct Node **rgb = color_node->vardef_value->vec_runtime_values;
 
             uint32_t hex = 0x00000000 |
                 (int)rgb[0]->float_value << 16 |

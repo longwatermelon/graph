@@ -2,6 +2,7 @@
 #include <string.h>
 
 struct Scope *g_scope = 0;
+bool g_ignore_fdefs = false;
 
 struct Node *visitor_visit(struct Node *n)
 {
@@ -55,9 +56,9 @@ struct Node *visitor_visit_var(struct Node *n)
     {
         switch (n->var_memb_access[0])
         {
-        case 'x': return visitor_visit(def->vardef_value->vec_values[0]);
-        case 'y': return visitor_visit(def->vardef_value->vec_values[1]);
-        case 'z': return visitor_visit(def->vardef_value->vec_values[2]);
+        case 'x': return visitor_visit(def->vardef_value->vec_tree_values[0]);
+        case 'y': return visitor_visit(def->vardef_value->vec_tree_values[1]);
+        case 'z': return visitor_visit(def->vardef_value->vec_tree_values[2]);
         }
     }
 
@@ -74,7 +75,9 @@ struct Node *visitor_visit_call(struct Node *n)
 
 struct Node *visitor_visit_fdef(struct Node *n)
 {
-    scope_add_fdef(g_scope, node_copy(n));
+    if (!g_ignore_fdefs)
+        scope_add_fdef(g_scope, node_copy(n));
+
     return n;
 }
 
@@ -106,11 +109,19 @@ struct Node *visitor_visit_constructor(struct Node *n)
 
 struct Node *visitor_visit_vec(struct Node *n)
 {
+    if (n->vec_runtime_values)
+    {
+        for (size_t i = 0; i < n->vec_len; ++i)
+            node_free(n->vec_runtime_values[i]);
+        free(n->vec_runtime_values);
+    }
+
+    n->vec_runtime_values = malloc(sizeof(struct Node*) * n->vec_len);
+
     for (size_t i = 0; i < n->vec_len; ++i)
     {
-        struct Node *tmp = node_copy(visitor_visit(n->vec_values[i]));
-        node_free(n->vec_values[i]);
-        n->vec_values[i] = tmp;
+        struct Node *tmp = node_copy(visitor_visit(n->vec_tree_values[i]));
+        n->vec_runtime_values[i] = tmp;
     }
 
     return n;
@@ -191,5 +202,11 @@ void visitor_bind_scope(struct Scope *s)
 struct Scope *visitor_scope_bound()
 {
     return g_scope;
+}
+
+
+void visitor_ignore_fdefs(bool ignore)
+{
+    g_ignore_fdefs = ignore;
 }
 

@@ -9,12 +9,12 @@ struct Scope
     {
         struct Node **vardefs;
         size_t nvardefs;
-
-        struct Node **fdefs;
-        size_t nfdefs;
     } *layers;
 
     size_t nlayers;
+
+    struct Node **fdefs;
+    size_t nfdefs;
 
     struct ScopeLayer *top;
 };
@@ -35,7 +35,7 @@ struct Node *scope_find_fdef(struct Scope *s, const char *name, bool error);
 void scope_add_vardef(struct Scope *s, struct Node *n);
 void scope_add_fdef(struct Scope *s, struct Node *n);
 
-void scope_clear(struct Scope *s);
+void scope_clear_vardefs(struct Scope *s);
 
 #endif
 
